@@ -43,3 +43,29 @@ def test_equal_execution_budget_and_generation_labels(tmp_path):
     assert all(g["summary"]["total_trials"] == 4 for g in result["groups"].values())
     assert all(m["kind"] == "scripted_proposal" for m in result["generation_metadata"])
     assert (tmp_path / "study.html").exists()
+
+
+def test_experiment_cli_commands(tmp_path, capsys):
+    from agent_chaos.cli import main
+
+    generated = tmp_path / "generated.yaml"
+    assert main(["generate", "scenarios/01_normal.yaml", "--output", str(generated)]) == 0
+    assert load_scenario(generated).split == "generated"
+    assert generated.with_suffix(".generation.json").exists()
+    assert main(["study", "scenarios", "--budget", "2", "--out", str(tmp_path / "study")]) == 0
+    failed = run_scenario(load_scenario("scenarios/03_after_timeout.yaml"), "flawed", out=tmp_path)
+    assert (
+        main(
+            [
+                "minimize",
+                str(tmp_path / failed["run_id"] / "trace.json"),
+                "--trials",
+                "2",
+                "--budget",
+                "4",
+                "--out",
+                str(tmp_path / "minimal"),
+            ]
+        )
+        == 0
+    )

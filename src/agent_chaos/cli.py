@@ -100,8 +100,92 @@ def main(argv=None):
     export = commands.add_parser("export", help="Export recorded JSON and static HTML")
     export.add_argument("trace")
     export.add_argument("--output", default="export.json")
+    generate = commands.add_parser("generate", help="Propose and validate a bounded scenario")
+    generate.add_argument("base")
+    generate.add_argument("--provider", choices=["scripted", "openai"], default="scripted")
+    generate.add_argument("--model")
+    generate.add_argument("--seed", type=int, default=17)
+    generate.add_argument("--output", default="runs/generated.yaml")
+    minimum = commands.add_parser(
+        "minimize", help="Greedily remove events while repeating a failure rule"
+    )
+    minimum.add_argument("trace")
+    minimum.add_argument("--trials", type=positive, default=3)
+    minimum.add_argument("--budget", type=positive, default=60)
+    minimum.add_argument("--rule")
+    minimum.add_argument("--out", default="runs/minimize")
+    research = commands.add_parser(
+        "study", help="Compare fixed/generated/random with equal target-run budgets"
+    )
+    research.add_argument("path")
+    research.add_argument("--budget", type=positive, default=24)
+    research.add_argument(
+        "--generator-provider", choices=["scripted", "openai"], default="scripted"
+    )
+    research.add_argument("--generator-model")
+    execution_options(research)
     args = parser.parse_args(argv)
     try:
+        if args.command == "generate":
+            from .generation import generate_scenario, write_scenario
+
+            candidate, metadata = generate_scenario(
+                load_scenario(args.base), args.seed, provider=args.provider, model=args.model
+            )
+            write_scenario(args.output, candidate)
+            write_json(Path(args.output).with_suffix(".generation.json"), metadata)
+            print(json.dumps({"scenario": args.output, "generation": metadata}, indent=2))
+            return 0
+        if args.command == "minimize":
+            from .experiments import minimize
+
+            data = minimize(
+                read_trace(args.trace),
+                out=args.out,
+                trials=args.trials,
+                budget=args.budget,
+                rule=args.rule,
+            )
+            print(
+                json.dumps(
+                    {
+                        k: data[k]
+                        for k in (
+                            "rule",
+                            "baseline_reproduced",
+                            "executions_used",
+                            "stop_reason",
+                            "note",
+                        )
+                    },
+                    indent=2,
+                )
+            )
+            return 0 if data["baseline_reproduced"] else 3
+        if args.command == "study":
+            from .experiments import study
+
+            data = study(
+                suite_paths(args.path),
+                budget=args.budget,
+                seed=args.seed if args.seed is not None else 17,
+                out=args.out,
+                agent_version=args.agent,
+                provider=args.provider,
+                model=args.model,
+                generator_provider=args.generator_provider,
+                generator_model=args.generator_model,
+            )
+            print(json.dumps({"summary": data["summary"], "note": data["note"]}, indent=2))
+            combined = summarize([t for g in data["groups"].values() for t in g["runs"]])
+            # Discovery of failures is study output. Harness errors and uncertainty still surface.
+            return (
+                2
+                if combined["counts"]["harness_error"]
+                else 3
+                if combined["counts"]["inconclusive"]
+                else 0
+            )
         if args.command == "run":
             scenario = load_scenario(args.scenario)
             if args.seed is not None:
@@ -183,7 +267,7 @@ def main(argv=None):
                 )
             )
         return 0
-    except (ValueError, OSError, KeyError, TypeError) as exc:
+    except Exception as exc:  # CLI boundary: provider/IO failures must be labeled harness errors.
         print(f"harness_error: {exc}", file=sys.stderr)
         return 2
 
