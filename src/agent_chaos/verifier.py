@@ -91,10 +91,11 @@ def verify(scenario: Scenario, initial: dict, final: dict, events: list[dict],
             continue
         if any(c[k] != intent[k] for k in ("payment_id", "customer_id", "amount_cents")):
             fail("claim_matches_request", intent, c)
-        matching = [r for r in new if all(r[k] == c[k] for k in
+        matching = [r for r in new if intent["expected_cents"] and all(r[k] == c[k] for k in
                                         ("payment_id", "customer_id", "amount_cents"))]
         observed_confirmation = []
-        for e in events:
+        response = next(r for r in responses if c in r.get("claims", []))
+        for e in events[:response.get("tool_event_end", len(events))]:
             observed = e["observed"]
             candidates = observed.get("refunds", [observed])
             if any(r.get("status") == "succeeded" and all(r.get(k) == c[k] for k in

@@ -31,7 +31,7 @@ def run_scenario(scenario: Scenario, agent_version="corrected", *, out: str | Pa
                  agent=None, parent_run: str | None = None) -> dict:
     start = time.perf_counter()
     run_id = uuid.uuid4().hex[:16]
-    directory = Path(out) / run_id
+    directory = Path(out).resolve() / run_id
     directory.mkdir(parents=True, exist_ok=False)
     service = PaymentService(directory / "payments.sqlite")
     initial = initial or {"payments": [p.model_dump() for p in scenario.payments], "refunds": []}

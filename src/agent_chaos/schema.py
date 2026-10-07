@@ -66,12 +66,17 @@ class Scenario(StrictModel):
         if len(slots) != len(set(slots)):
             raise ValueError("only one fault per tool invocation")
         seen = {}
+        executed_amounts = {}
         for turn in self.turns:
             for m in turn.messages:
                 identity = (m.payment_id, m.customer_id)
                 if m.request_id in seen and seen[m.request_id] != identity:
                     raise ValueError("request ID cannot change payment/customer")
                 seen[m.request_id] = identity
+                if m.request_id in executed_amounts and executed_amounts[m.request_id] != m.amount_cents:
+                    raise ValueError("amount changes after an execution turn are unsupported")
+            for m in turn.messages:
+                executed_amounts[m.request_id] = m.amount_cents
         return self
 
 

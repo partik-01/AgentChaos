@@ -67,3 +67,9 @@ def test_balance_and_existing_state_corruption():
     assert "remaining_balance_not_exceeded" in rules(verify(s, initial, final, events, responses))
     final["payments"][0]["amount_cents"] = 2000
     assert "payment_records_immutable" in rules(verify(s, initial, final, events, responses))
+
+
+def test_future_tool_confirmation_cannot_justify_earlier_claim():
+    s, initial, final, events, responses = case()
+    responses[0]["tool_event_end"] = 0
+    assert "customer_outcome_agrees_with_evidence" in rules(verify(s, initial, final, events, responses))
