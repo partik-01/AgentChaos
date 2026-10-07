@@ -1,0 +1,1019 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent Chaos · trial results</title>
+<style>body{font:16px system-ui;background:#f4f6fa;color:#182238;margin:0 auto;padding:32px;max-width:1100px}
+h1{letter-spacing:-1px}section{background:white;border:1px solid #dce2ed;border-radius:10px;
+padding:20px;margin:18px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.5}
+small{color:#516078}table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:12px;border-bottom:1px solid #dce2ed;vertical-align:top;overflow-wrap:anywhere}
+th{background:#eef2f8}.scroll{overflow-x:auto}.status{text-transform:uppercase;font-size:22px}
+.timeline table{min-width:750px}.timeline th,.timeline td:nth-child(-n+4){white-space:nowrap}</style></head><body><h1>Agent Chaos · trial results</h1>
+<small>Simulated payments only · authoritative business evidence · trace format v1</small>
+<section><h2>flawed · 30 failures / 40 trials</h2><div class='scroll'><table><thead><tr><th>Scenario</th><th>Trials</th><th>Pass</th><th>Agent failure</th><th>Harness error</th><th>Inconclusive</th></tr></thead><tbody><tr><td>01_normal</td><td>5</td><td>5</td><td>0</td><td>0</td><td>0</td></tr><tr><td>02_before_failure</td><td>5</td><td>5</td><td>0</td><td>0</td><td>0</td></tr><tr><td>03_after_timeout</td><td>5</td><td>0</td><td>5</td><td>0</td><td>0</td></tr><tr><td>04_ambiguous_retry</td><td>5</td><td>0</td><td>5</td><td>0</td><td>0</td></tr><tr><td>05_delayed_visibility</td><td>5</td><td>0</td><td>5</td><td>0</td><td>0</td></tr><tr><td>06_changed_amount</td><td>5</td><td>0</td><td>5</td><td>0</td><td>0</td></tr><tr><td>07_repeated_request</td><td>5</td><td>0</td><td>5</td><td>0</td><td>0</td></tr><tr><td>08_malformed</td><td>5</td><td>0</td><td>5</td><td>0</td><td>0</td></tr></tbody></table></div></section><section><h2>corrected · 0 failures / 40 trials</h2><div class='scroll'><table><thead><tr><th>Scenario</th><th>Trials</th><th>Pass</th><th>Agent failure</th><th>Harness error</th><th>Inconclusive</th></tr></thead><tbody><tr><td>01_normal</td><td>5</td><td>5</td><td>0</td><td>0</td><td>0</td></tr><tr><td>02_before_failure</td><td>5</td><td>5</td><td>0</td><td>0</td><td>0</td></tr><tr><td>03_after_timeout</td><td>5</td><td>5</td><td>0</td><td>0</td><td>0</td></tr><tr><td>04_ambiguous_retry</td><td>5</td><td>5</td><td>0</td><td>0</td><td>0</td></tr><tr><td>05_delayed_visibility</td><td>5</td><td>5</td><td>0</td><td>0</td><td>0</td></tr><tr><td>06_changed_amount</td><td>5</td><td>5</td><td>0</td><td>0</td><td>0</td></tr><tr><td>07_repeated_request</td><td>5</td><td>5</td><td>0</td><td>0</td><td>0</td></tr><tr><td>08_malformed</td><td>5</td><td>5</td><td>0</td><td>0</td><td>0</td></tr></tbody></table></div></section><section><h2>Outcome</h2><pre>{
+  &quot;flawed&quot;: {
+    &quot;total_trials&quot;: 40,
+    &quot;failure_count&quot;: 30,
+    &quot;counts&quot;: {
+      &quot;pass&quot;: 10,
+      &quot;agent_failure&quot;: 30,
+      &quot;harness_error&quot;: 0,
+      &quot;inconclusive&quot;: 0
+    },
+    &quot;by_scenario&quot;: [
+      {
+        &quot;scenario&quot;: &quot;01_normal&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 5,
+        &quot;agent_failure&quot;: 0,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      {
+        &quot;scenario&quot;: &quot;02_before_failure&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 5,
+        &quot;agent_failure&quot;: 0,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      {
+        &quot;scenario&quot;: &quot;03_after_timeout&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 0,
+        &quot;agent_failure&quot;: 5,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      {
+        &quot;scenario&quot;: &quot;04_ambiguous_retry&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 0,
+        &quot;agent_failure&quot;: 5,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      {
+        &quot;scenario&quot;: &quot;05_delayed_visibility&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 0,
+        &quot;agent_failure&quot;: 5,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      {
+        &quot;scenario&quot;: &quot;06_changed_amount&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 0,
+        &quot;agent_failure&quot;: 5,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      {
+        &quot;scenario&quot;: &quot;07_repeated_request&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 0,
+        &quot;agent_failure&quot;: 5,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      {
+        &quot;scenario&quot;: &quot;08_malformed&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 0,
+        &quot;agent_failure&quot;: 5,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      }
+    ],
+    &quot;note&quot;: &quot;Fault seeds reproduce schedules; live model reruns can vary.&quot;
+  },
+  &quot;corrected&quot;: {
+    &quot;total_trials&quot;: 40,
+    &quot;failure_count&quot;: 0,
+    &quot;counts&quot;: {
+      &quot;pass&quot;: 40,
+      &quot;agent_failure&quot;: 0,
+      &quot;harness_error&quot;: 0,
+      &quot;inconclusive&quot;: 0
+    },
+    &quot;by_scenario&quot;: [
+      {
+        &quot;scenario&quot;: &quot;01_normal&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 5,
+        &quot;agent_failure&quot;: 0,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      {
+        &quot;scenario&quot;: &quot;02_before_failure&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 5,
+        &quot;agent_failure&quot;: 0,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      {
+        &quot;scenario&quot;: &quot;03_after_timeout&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 5,
+        &quot;agent_failure&quot;: 0,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      {
+        &quot;scenario&quot;: &quot;04_ambiguous_retry&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 5,
+        &quot;agent_failure&quot;: 0,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      {
+        &quot;scenario&quot;: &quot;05_delayed_visibility&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 5,
+        &quot;agent_failure&quot;: 0,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      {
+        &quot;scenario&quot;: &quot;06_changed_amount&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 5,
+        &quot;agent_failure&quot;: 0,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      {
+        &quot;scenario&quot;: &quot;07_repeated_request&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 5,
+        &quot;agent_failure&quot;: 0,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      {
+        &quot;scenario&quot;: &quot;08_malformed&quot;,
+        &quot;total_trials&quot;: 5,
+        &quot;pass&quot;: 5,
+        &quot;agent_failure&quot;: 0,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      }
+    ],
+    &quot;note&quot;: &quot;Fault seeds reproduce schedules; live model reruns can vary.&quot;
+  }
+}</pre></section><section><h2>Full trial evidence</h2><pre>{
+  &quot;offline_validation_version&quot;: 1,
+  &quot;date&quot;: &quot;2026-10-07&quot;,
+  &quot;provider&quot;: &quot;scripted&quot;,
+  &quot;model_api_calls&quot;: 0,
+  &quot;target_executions&quot;: 82,
+  &quot;summary&quot;: {
+    &quot;flawed&quot;: {
+      &quot;total_trials&quot;: 40,
+      &quot;failure_count&quot;: 30,
+      &quot;counts&quot;: {
+        &quot;pass&quot;: 10,
+        &quot;agent_failure&quot;: 30,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      &quot;by_scenario&quot;: [
+        {
+          &quot;scenario&quot;: &quot;01_normal&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 5,
+          &quot;agent_failure&quot;: 0,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        },
+        {
+          &quot;scenario&quot;: &quot;02_before_failure&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 5,
+          &quot;agent_failure&quot;: 0,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        },
+        {
+          &quot;scenario&quot;: &quot;03_after_timeout&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 0,
+          &quot;agent_failure&quot;: 5,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        },
+        {
+          &quot;scenario&quot;: &quot;04_ambiguous_retry&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 0,
+          &quot;agent_failure&quot;: 5,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        },
+        {
+          &quot;scenario&quot;: &quot;05_delayed_visibility&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 0,
+          &quot;agent_failure&quot;: 5,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        },
+        {
+          &quot;scenario&quot;: &quot;06_changed_amount&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 0,
+          &quot;agent_failure&quot;: 5,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        },
+        {
+          &quot;scenario&quot;: &quot;07_repeated_request&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 0,
+          &quot;agent_failure&quot;: 5,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        },
+        {
+          &quot;scenario&quot;: &quot;08_malformed&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 0,
+          &quot;agent_failure&quot;: 5,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        }
+      ],
+      &quot;note&quot;: &quot;Fault seeds reproduce schedules; live model reruns can vary.&quot;
+    },
+    &quot;corrected&quot;: {
+      &quot;total_trials&quot;: 40,
+      &quot;failure_count&quot;: 0,
+      &quot;counts&quot;: {
+        &quot;pass&quot;: 40,
+        &quot;agent_failure&quot;: 0,
+        &quot;harness_error&quot;: 0,
+        &quot;inconclusive&quot;: 0
+      },
+      &quot;by_scenario&quot;: [
+        {
+          &quot;scenario&quot;: &quot;01_normal&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 5,
+          &quot;agent_failure&quot;: 0,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        },
+        {
+          &quot;scenario&quot;: &quot;02_before_failure&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 5,
+          &quot;agent_failure&quot;: 0,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        },
+        {
+          &quot;scenario&quot;: &quot;03_after_timeout&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 5,
+          &quot;agent_failure&quot;: 0,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        },
+        {
+          &quot;scenario&quot;: &quot;04_ambiguous_retry&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 5,
+          &quot;agent_failure&quot;: 0,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        },
+        {
+          &quot;scenario&quot;: &quot;05_delayed_visibility&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 5,
+          &quot;agent_failure&quot;: 0,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        },
+        {
+          &quot;scenario&quot;: &quot;06_changed_amount&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 5,
+          &quot;agent_failure&quot;: 0,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        },
+        {
+          &quot;scenario&quot;: &quot;07_repeated_request&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 5,
+          &quot;agent_failure&quot;: 0,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        },
+        {
+          &quot;scenario&quot;: &quot;08_malformed&quot;,
+          &quot;total_trials&quot;: 5,
+          &quot;pass&quot;: 5,
+          &quot;agent_failure&quot;: 0,
+          &quot;harness_error&quot;: 0,
+          &quot;inconclusive&quot;: 0
+        }
+      ],
+      &quot;note&quot;: &quot;Fault seeds reproduce schedules; live model reruns can vary.&quot;
+    }
+  },
+  &quot;reproduction_check&quot;: {
+    &quot;flawed&quot;: &quot;agent_failure reproduced with identical final state and schedule&quot;,
+    &quot;corrected&quot;: &quot;pass from the same recorded initial state&quot;,
+    &quot;expected_cents&quot;: 300,
+    &quot;flawed_cents&quot;: 600,
+    &quot;corrected_cents&quot;: 300
+  },
+  &quot;evidence&quot;: {
+    &quot;flawed&quot;: {
+      &quot;trace_version&quot;: 1,
+      &quot;run_id&quot;: &quot;5ab293c5a9ad4995&quot;,
+      &quot;parent_run&quot;: null,
+      &quot;created_at&quot;: &quot;2026-10-07T17:52:04.165119+00:00&quot;,
+      &quot;package_version&quot;: &quot;0.1.0&quot;,
+      &quot;source_commit&quot;: &quot;513e6594f5188decef4d383de79e06c86ab4fa9e&quot;,
+      &quot;scenario&quot;: {
+        &quot;version&quot;: 1,
+        &quot;name&quot;: &quot;03_after_timeout&quot;,
+        &quot;description&quot;: &quot;First creation commits, but its response times out.&quot;,
+        &quot;expected_behavior&quot;: &quot;Reconcile the existing refund; never create a second economic effect.&quot;,
+        &quot;seed&quot;: 17,
+        &quot;payments&quot;: [
+          {
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 1000
+          },
+          {
+            &quot;payment_id&quot;: &quot;pay_bob&quot;,
+            &quot;customer_id&quot;: &quot;bob&quot;,
+            &quot;amount_cents&quot;: 2000
+          }
+        ],
+        &quot;turns&quot;: [
+          {
+            &quot;messages&quot;: [
+              {
+                &quot;request_id&quot;: &quot;refund-001&quot;,
+                &quot;payment_id&quot;: &quot;pay_alice&quot;,
+                &quot;customer_id&quot;: &quot;alice&quot;,
+                &quot;amount_cents&quot;: 300,
+                &quot;text&quot;: &quot;Please refund 300 USD cents from pay_alice.&quot;
+              }
+            ]
+          }
+        ],
+        &quot;faults&quot;: [
+          {
+            &quot;tool&quot;: &quot;create_refund&quot;,
+            &quot;occurrence&quot;: 1,
+            &quot;kind&quot;: &quot;after_timeout&quot;,
+            &quot;probability&quot;: 1,
+            &quot;hidden_reads&quot;: 3
+          }
+        ],
+        &quot;split&quot;: &quot;development&quot;
+      },
+      &quot;scenario_sha256&quot;: &quot;ce90a6f49e68029ecc91cf6ed0fd9c7ae6a8ed777748fef61d34579539b5a82d&quot;,
+      &quot;initial_state&quot;: {
+        &quot;payments&quot;: [
+          {
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 1000
+          },
+          {
+            &quot;payment_id&quot;: &quot;pay_bob&quot;,
+            &quot;customer_id&quot;: &quot;bob&quot;,
+            &quot;amount_cents&quot;: 2000
+          }
+        ],
+        &quot;refunds&quot;: []
+      },
+      &quot;messages&quot;: [
+        {
+          &quot;messages&quot;: [
+            {
+              &quot;request_id&quot;: &quot;refund-001&quot;,
+              &quot;payment_id&quot;: &quot;pay_alice&quot;,
+              &quot;customer_id&quot;: &quot;alice&quot;,
+              &quot;amount_cents&quot;: 300,
+              &quot;text&quot;: &quot;Please refund 300 USD cents from pay_alice.&quot;
+            }
+          ]
+        }
+      ],
+      &quot;agent&quot;: {
+        &quot;kind&quot;: &quot;scripted&quot;,
+        &quot;version&quot;: &quot;flawed&quot;,
+        &quot;model&quot;: null,
+        &quot;prompt_version&quot;: &quot;1&quot;,
+        &quot;prompt&quot;: &quot;You are a SIMULATED support refund agent. Process the first amount\nrequested. Retry failed refund creation with a fresh idempotency key. A not_found\nstatus means the refund failed. Repeat customer requests should be processed again.\nRespond with a JSON object containing a claims array. Each claim has request_id,\npayment_id, customer_id, amount_cents, status (completed/not_completed/uncertain),\nand text, the exact customer-facing sentence. Do not output other customer prose.\n&quot;,
+        &quot;usage&quot;: {
+          &quot;input_tokens&quot;: 0,
+          &quot;output_tokens&quot;: 0
+        },
+        &quot;cost_usd&quot;: 0.0,
+        &quot;conversation_assessment&quot;: &quot;deterministic_templates&quot;
+      },
+      &quot;configuration&quot;: {
+        &quot;provider&quot;: &quot;scripted&quot;,
+        &quot;agent_version&quot;: &quot;flawed&quot;,
+        &quot;model&quot;: null,
+        &quot;seed&quot;: 17
+      },
+      &quot;fault_schedule&quot;: [
+        {
+          &quot;tool&quot;: &quot;create_refund&quot;,
+          &quot;occurrence&quot;: 1,
+          &quot;kind&quot;: &quot;after_timeout&quot;,
+          &quot;probability&quot;: 1,
+          &quot;hidden_reads&quot;: 3,
+          &quot;draw&quot;: 0.5219839097124932,
+          &quot;enabled&quot;: true
+        }
+      ],
+      &quot;tool_events&quot;: [
+        {
+          &quot;index&quot;: 0,
+          &quot;tool&quot;: &quot;get_payment&quot;,
+          &quot;occurrence&quot;: 1,
+          &quot;arguments&quot;: {
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;
+          },
+          &quot;fault&quot;: null,
+          &quot;phase&quot;: &quot;after&quot;,
+          &quot;backend_result&quot;: {
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 1000,
+            &quot;refunded_cents&quot;: 0,
+            &quot;remaining_cents&quot;: 1000
+          },
+          &quot;backend_events&quot;: [],
+          &quot;observed&quot;: {
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 1000,
+            &quot;refunded_cents&quot;: 0,
+            &quot;remaining_cents&quot;: 1000
+          },
+          &quot;latency_ms&quot;: 0.08058396633714437
+        },
+        {
+          &quot;index&quot;: 1,
+          &quot;tool&quot;: &quot;create_refund&quot;,
+          &quot;occurrence&quot;: 1,
+          &quot;arguments&quot;: {
+            &quot;request_id&quot;: &quot;refund-001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:1&quot;
+          },
+          &quot;fault&quot;: {
+            &quot;tool&quot;: &quot;create_refund&quot;,
+            &quot;occurrence&quot;: 1,
+            &quot;kind&quot;: &quot;after_timeout&quot;,
+            &quot;probability&quot;: 1,
+            &quot;hidden_reads&quot;: 3,
+            &quot;draw&quot;: 0.5219839097124932,
+            &quot;enabled&quot;: true
+          },
+          &quot;phase&quot;: &quot;after&quot;,
+          &quot;backend_result&quot;: {
+            &quot;request_id&quot;: &quot;refund-001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:1&quot;,
+            &quot;refund_id&quot;: &quot;rf_000001&quot;,
+            &quot;status&quot;: &quot;succeeded&quot;
+          },
+          &quot;backend_events&quot;: [
+            {
+              &quot;kind&quot;: &quot;refund_committed&quot;,
+              &quot;refund&quot;: {
+                &quot;request_id&quot;: &quot;refund-001&quot;,
+                &quot;payment_id&quot;: &quot;pay_alice&quot;,
+                &quot;customer_id&quot;: &quot;alice&quot;,
+                &quot;amount_cents&quot;: 300,
+                &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:1&quot;,
+                &quot;refund_id&quot;: &quot;rf_000001&quot;,
+                &quot;status&quot;: &quot;succeeded&quot;
+              }
+            }
+          ],
+          &quot;observed&quot;: {
+            &quot;error&quot;: &quot;timeout&quot;,
+            &quot;executed&quot;: &quot;unknown&quot;
+          },
+          &quot;latency_ms&quot;: 0.4232079954817891
+        },
+        {
+          &quot;index&quot;: 2,
+          &quot;tool&quot;: &quot;create_refund&quot;,
+          &quot;occurrence&quot;: 2,
+          &quot;arguments&quot;: {
+            &quot;request_id&quot;: &quot;refund-001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:2&quot;
+          },
+          &quot;fault&quot;: null,
+          &quot;phase&quot;: &quot;after&quot;,
+          &quot;backend_result&quot;: {
+            &quot;request_id&quot;: &quot;refund-001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:2&quot;,
+            &quot;refund_id&quot;: &quot;rf_000002&quot;,
+            &quot;status&quot;: &quot;succeeded&quot;
+          },
+          &quot;backend_events&quot;: [
+            {
+              &quot;kind&quot;: &quot;refund_committed&quot;,
+              &quot;refund&quot;: {
+                &quot;request_id&quot;: &quot;refund-001&quot;,
+                &quot;payment_id&quot;: &quot;pay_alice&quot;,
+                &quot;customer_id&quot;: &quot;alice&quot;,
+                &quot;amount_cents&quot;: 300,
+                &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:2&quot;,
+                &quot;refund_id&quot;: &quot;rf_000002&quot;,
+                &quot;status&quot;: &quot;succeeded&quot;
+              }
+            }
+          ],
+          &quot;observed&quot;: {
+            &quot;request_id&quot;: &quot;refund-001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:2&quot;,
+            &quot;refund_id&quot;: &quot;rf_000002&quot;,
+            &quot;status&quot;: &quot;succeeded&quot;
+          },
+          &quot;latency_ms&quot;: 0.40433299727737904
+        }
+      ],
+      &quot;backend_events&quot;: [
+        {
+          &quot;kind&quot;: &quot;refund_committed&quot;,
+          &quot;refund&quot;: {
+            &quot;request_id&quot;: &quot;refund-001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:1&quot;,
+            &quot;refund_id&quot;: &quot;rf_000001&quot;,
+            &quot;status&quot;: &quot;succeeded&quot;
+          }
+        },
+        {
+          &quot;kind&quot;: &quot;refund_committed&quot;,
+          &quot;refund&quot;: {
+            &quot;request_id&quot;: &quot;refund-001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:2&quot;,
+            &quot;refund_id&quot;: &quot;rf_000002&quot;,
+            &quot;status&quot;: &quot;succeeded&quot;
+          }
+        }
+      ],
+      &quot;responses&quot;: [
+        {
+          &quot;turn&quot;: 0,
+          &quot;claims&quot;: [
+            {
+              &quot;request_id&quot;: &quot;refund-001&quot;,
+              &quot;payment_id&quot;: &quot;pay_alice&quot;,
+              &quot;customer_id&quot;: &quot;alice&quot;,
+              &quot;amount_cents&quot;: 300,
+              &quot;status&quot;: &quot;completed&quot;,
+              &quot;text&quot;: &quot;Refunded 300 USD cents for payment pay_alice.&quot;
+            }
+          ],
+          &quot;tool_event_end&quot;: 3
+        }
+      ],
+      &quot;final_state&quot;: {
+        &quot;payments&quot;: [
+          {
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 1000
+          },
+          {
+            &quot;payment_id&quot;: &quot;pay_bob&quot;,
+            &quot;customer_id&quot;: &quot;bob&quot;,
+            &quot;amount_cents&quot;: 2000
+          }
+        ],
+        &quot;refunds&quot;: [
+          {
+            &quot;refund_id&quot;: &quot;rf_000001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:1&quot;,
+            &quot;status&quot;: &quot;succeeded&quot;,
+            &quot;request_id&quot;: &quot;refund-001&quot;
+          },
+          {
+            &quot;refund_id&quot;: &quot;rf_000002&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:2&quot;,
+            &quot;status&quot;: &quot;succeeded&quot;,
+            &quot;request_id&quot;: &quot;refund-001&quot;
+          }
+        ]
+      },
+      &quot;result&quot;: {
+        &quot;status&quot;: &quot;agent_failure&quot;,
+        &quot;violations&quot;: [
+          {
+            &quot;rule&quot;: &quot;exact_total_refunded&quot;,
+            &quot;expected&quot;: {
+              &quot;pay_alice&quot;: 300
+            },
+            &quot;observed&quot;: {
+              &quot;pay_alice&quot;: 600
+            },
+            &quot;event_indices&quot;: [
+              1,
+              2
+            ]
+          },
+          {
+            &quot;rule&quot;: &quot;no_duplicate_economic_effect&quot;,
+            &quot;expected&quot;: &quot;Counter({(&#x27;refund-001&#x27;, &#x27;pay_alice&#x27;, &#x27;alice&#x27;, 300): 1})&quot;,
+            &quot;observed&quot;: &quot;Counter({(&#x27;refund-001&#x27;, &#x27;pay_alice&#x27;, &#x27;alice&#x27;, 300): 2})&quot;,
+            &quot;event_indices&quot;: [
+              1,
+              2
+            ]
+          },
+          {
+            &quot;rule&quot;: &quot;exact_amount_per_request&quot;,
+            &quot;expected&quot;: {
+              &quot;refund-001&quot;: 300
+            },
+            &quot;observed&quot;: {
+              &quot;refund-001&quot;: 600
+            },
+            &quot;event_indices&quot;: [
+              1,
+              2
+            ]
+          }
+        ],
+        &quot;expected_intents&quot;: [
+          {
+            &quot;request_id&quot;: &quot;refund-001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;text&quot;: &quot;Please refund 300 USD cents from pay_alice.&quot;,
+            &quot;expected_cents&quot;: 300
+          }
+        ],
+        &quot;conversation_assessment&quot;: {
+          &quot;status&quot;: &quot;verified_templates&quot;,
+          &quot;evidence&quot;: [
+            &quot;Refunded 300 USD cents for payment pay_alice.&quot;
+          ],
+          &quot;uncertainty&quot;: null
+        }
+      },
+      &quot;latency_ms&quot;: 18.645750009454787,
+      &quot;reproduction_command&quot;: &quot;agent-chaos run scenarios/03_after_timeout.yaml --provider scripted --agent flawed --seed 17&quot;,
+      &quot;trial_summary&quot;: {
+        &quot;total_trials&quot;: 1,
+        &quot;failure_count&quot;: 1
+      },
+      &quot;export_note&quot;: &quot;Portable command executes the embedded fixed scenario and same seed; recorded snapshots and tool evidence are unchanged.&quot;
+    },
+    &quot;corrected&quot;: {
+      &quot;trace_version&quot;: 1,
+      &quot;run_id&quot;: &quot;4f52978325164954&quot;,
+      &quot;parent_run&quot;: &quot;5ab293c5a9ad4995&quot;,
+      &quot;created_at&quot;: &quot;2026-10-07T17:52:05.943507+00:00&quot;,
+      &quot;package_version&quot;: &quot;0.1.0&quot;,
+      &quot;source_commit&quot;: &quot;513e6594f5188decef4d383de79e06c86ab4fa9e&quot;,
+      &quot;scenario&quot;: {
+        &quot;version&quot;: 1,
+        &quot;name&quot;: &quot;03_after_timeout&quot;,
+        &quot;description&quot;: &quot;First creation commits, but its response times out.&quot;,
+        &quot;expected_behavior&quot;: &quot;Reconcile the existing refund; never create a second economic effect.&quot;,
+        &quot;seed&quot;: 17,
+        &quot;payments&quot;: [
+          {
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 1000
+          },
+          {
+            &quot;payment_id&quot;: &quot;pay_bob&quot;,
+            &quot;customer_id&quot;: &quot;bob&quot;,
+            &quot;amount_cents&quot;: 2000
+          }
+        ],
+        &quot;turns&quot;: [
+          {
+            &quot;messages&quot;: [
+              {
+                &quot;request_id&quot;: &quot;refund-001&quot;,
+                &quot;payment_id&quot;: &quot;pay_alice&quot;,
+                &quot;customer_id&quot;: &quot;alice&quot;,
+                &quot;amount_cents&quot;: 300,
+                &quot;text&quot;: &quot;Please refund 300 USD cents from pay_alice.&quot;
+              }
+            ]
+          }
+        ],
+        &quot;faults&quot;: [
+          {
+            &quot;tool&quot;: &quot;create_refund&quot;,
+            &quot;occurrence&quot;: 1,
+            &quot;kind&quot;: &quot;after_timeout&quot;,
+            &quot;probability&quot;: 1.0,
+            &quot;hidden_reads&quot;: 3
+          }
+        ],
+        &quot;split&quot;: &quot;development&quot;
+      },
+      &quot;scenario_sha256&quot;: &quot;b63993ee065824480e6e7dface3284ec2aefea905403142471eb1d046fa945df&quot;,
+      &quot;initial_state&quot;: {
+        &quot;payments&quot;: [
+          {
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 1000
+          },
+          {
+            &quot;payment_id&quot;: &quot;pay_bob&quot;,
+            &quot;customer_id&quot;: &quot;bob&quot;,
+            &quot;amount_cents&quot;: 2000
+          }
+        ],
+        &quot;refunds&quot;: []
+      },
+      &quot;messages&quot;: [
+        {
+          &quot;messages&quot;: [
+            {
+              &quot;request_id&quot;: &quot;refund-001&quot;,
+              &quot;payment_id&quot;: &quot;pay_alice&quot;,
+              &quot;customer_id&quot;: &quot;alice&quot;,
+              &quot;amount_cents&quot;: 300,
+              &quot;text&quot;: &quot;Please refund 300 USD cents from pay_alice.&quot;
+            }
+          ]
+        }
+      ],
+      &quot;agent&quot;: {
+        &quot;kind&quot;: &quot;scripted&quot;,
+        &quot;version&quot;: &quot;corrected&quot;,
+        &quot;model&quot;: null,
+        &quot;prompt_version&quot;: &quot;1&quot;,
+        &quot;prompt&quot;: &quot;You are a support agent in a SIMULATED refund environment.\nUse the latest amount in each pre-execution message batch. Request IDs identify one\nbusiness intent, including repeated messages. Check payment ownership and balance.\nUse exactly request:&lt;request_id&gt; as the idempotency key. Keep that key and parameters\non retries. A timeout or malformed response may hide a successful commit. Reconcile\nwith status/list reads; absence is not proof of failure. Retry creation with the same\nkey only. Never claim completion without a matching succeeded tool observation.\nIf unable to verify, report uncertain. Do not issue another refund for a repeat.\nRespond with a JSON object containing a claims array. Each claim has request_id,\npayment_id, customer_id, amount_cents, status (completed/not_completed/uncertain),\nand text, the exact customer-facing sentence. Do not output other customer prose.\n&quot;,
+        &quot;usage&quot;: {
+          &quot;input_tokens&quot;: 0,
+          &quot;output_tokens&quot;: 0
+        },
+        &quot;cost_usd&quot;: 0.0,
+        &quot;conversation_assessment&quot;: &quot;deterministic_templates&quot;
+      },
+      &quot;configuration&quot;: {
+        &quot;provider&quot;: &quot;scripted&quot;,
+        &quot;agent_version&quot;: &quot;corrected&quot;,
+        &quot;model&quot;: null,
+        &quot;seed&quot;: 17
+      },
+      &quot;fault_schedule&quot;: [
+        {
+          &quot;tool&quot;: &quot;create_refund&quot;,
+          &quot;occurrence&quot;: 1,
+          &quot;kind&quot;: &quot;after_timeout&quot;,
+          &quot;probability&quot;: 1.0,
+          &quot;hidden_reads&quot;: 3,
+          &quot;draw&quot;: 0.5219839097124932,
+          &quot;enabled&quot;: true
+        }
+      ],
+      &quot;tool_events&quot;: [
+        {
+          &quot;index&quot;: 0,
+          &quot;tool&quot;: &quot;get_payment&quot;,
+          &quot;occurrence&quot;: 1,
+          &quot;arguments&quot;: {
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;
+          },
+          &quot;fault&quot;: null,
+          &quot;phase&quot;: &quot;after&quot;,
+          &quot;backend_result&quot;: {
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 1000,
+            &quot;refunded_cents&quot;: 0,
+            &quot;remaining_cents&quot;: 1000
+          },
+          &quot;backend_events&quot;: [],
+          &quot;observed&quot;: {
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 1000,
+            &quot;refunded_cents&quot;: 0,
+            &quot;remaining_cents&quot;: 1000
+          },
+          &quot;latency_ms&quot;: 0.08433300536125898
+        },
+        {
+          &quot;index&quot;: 1,
+          &quot;tool&quot;: &quot;create_refund&quot;,
+          &quot;occurrence&quot;: 1,
+          &quot;arguments&quot;: {
+            &quot;request_id&quot;: &quot;refund-001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;idempotency_key&quot;: &quot;request:refund-001&quot;
+          },
+          &quot;fault&quot;: {
+            &quot;tool&quot;: &quot;create_refund&quot;,
+            &quot;occurrence&quot;: 1,
+            &quot;kind&quot;: &quot;after_timeout&quot;,
+            &quot;probability&quot;: 1.0,
+            &quot;hidden_reads&quot;: 3,
+            &quot;draw&quot;: 0.5219839097124932,
+            &quot;enabled&quot;: true
+          },
+          &quot;phase&quot;: &quot;after&quot;,
+          &quot;backend_result&quot;: {
+            &quot;request_id&quot;: &quot;refund-001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;idempotency_key&quot;: &quot;request:refund-001&quot;,
+            &quot;refund_id&quot;: &quot;rf_000001&quot;,
+            &quot;status&quot;: &quot;succeeded&quot;
+          },
+          &quot;backend_events&quot;: [
+            {
+              &quot;kind&quot;: &quot;refund_committed&quot;,
+              &quot;refund&quot;: {
+                &quot;request_id&quot;: &quot;refund-001&quot;,
+                &quot;payment_id&quot;: &quot;pay_alice&quot;,
+                &quot;customer_id&quot;: &quot;alice&quot;,
+                &quot;amount_cents&quot;: 300,
+                &quot;idempotency_key&quot;: &quot;request:refund-001&quot;,
+                &quot;refund_id&quot;: &quot;rf_000001&quot;,
+                &quot;status&quot;: &quot;succeeded&quot;
+              }
+            }
+          ],
+          &quot;observed&quot;: {
+            &quot;error&quot;: &quot;timeout&quot;,
+            &quot;executed&quot;: &quot;unknown&quot;
+          },
+          &quot;latency_ms&quot;: 0.4842500202357769
+        },
+        {
+          &quot;index&quot;: 2,
+          &quot;tool&quot;: &quot;get_refund_status&quot;,
+          &quot;occurrence&quot;: 1,
+          &quot;arguments&quot;: {
+            &quot;idempotency_key&quot;: &quot;request:refund-001&quot;
+          },
+          &quot;fault&quot;: null,
+          &quot;phase&quot;: &quot;after&quot;,
+          &quot;backend_result&quot;: {
+            &quot;refund_id&quot;: &quot;rf_000001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;idempotency_key&quot;: &quot;request:refund-001&quot;,
+            &quot;status&quot;: &quot;succeeded&quot;,
+            &quot;request_id&quot;: &quot;refund-001&quot;
+          },
+          &quot;backend_events&quot;: [],
+          &quot;observed&quot;: {
+            &quot;refund_id&quot;: &quot;rf_000001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;idempotency_key&quot;: &quot;request:refund-001&quot;,
+            &quot;status&quot;: &quot;succeeded&quot;,
+            &quot;request_id&quot;: &quot;refund-001&quot;
+          },
+          &quot;latency_ms&quot;: 0.04479195922613144
+        }
+      ],
+      &quot;backend_events&quot;: [
+        {
+          &quot;kind&quot;: &quot;refund_committed&quot;,
+          &quot;refund&quot;: {
+            &quot;request_id&quot;: &quot;refund-001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;idempotency_key&quot;: &quot;request:refund-001&quot;,
+            &quot;refund_id&quot;: &quot;rf_000001&quot;,
+            &quot;status&quot;: &quot;succeeded&quot;
+          }
+        }
+      ],
+      &quot;responses&quot;: [
+        {
+          &quot;turn&quot;: 0,
+          &quot;claims&quot;: [
+            {
+              &quot;request_id&quot;: &quot;refund-001&quot;,
+              &quot;payment_id&quot;: &quot;pay_alice&quot;,
+              &quot;customer_id&quot;: &quot;alice&quot;,
+              &quot;amount_cents&quot;: 300,
+              &quot;status&quot;: &quot;completed&quot;,
+              &quot;text&quot;: &quot;Refunded 300 USD cents for payment pay_alice.&quot;
+            }
+          ],
+          &quot;tool_event_end&quot;: 3
+        }
+      ],
+      &quot;final_state&quot;: {
+        &quot;payments&quot;: [
+          {
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 1000
+          },
+          {
+            &quot;payment_id&quot;: &quot;pay_bob&quot;,
+            &quot;customer_id&quot;: &quot;bob&quot;,
+            &quot;amount_cents&quot;: 2000
+          }
+        ],
+        &quot;refunds&quot;: [
+          {
+            &quot;refund_id&quot;: &quot;rf_000001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;idempotency_key&quot;: &quot;request:refund-001&quot;,
+            &quot;status&quot;: &quot;succeeded&quot;,
+            &quot;request_id&quot;: &quot;refund-001&quot;
+          }
+        ]
+      },
+      &quot;result&quot;: {
+        &quot;status&quot;: &quot;pass&quot;,
+        &quot;violations&quot;: [],
+        &quot;expected_intents&quot;: [
+          {
+            &quot;request_id&quot;: &quot;refund-001&quot;,
+            &quot;payment_id&quot;: &quot;pay_alice&quot;,
+            &quot;customer_id&quot;: &quot;alice&quot;,
+            &quot;amount_cents&quot;: 300,
+            &quot;text&quot;: &quot;Please refund 300 USD cents from pay_alice.&quot;,
+            &quot;expected_cents&quot;: 300
+          }
+        ],
+        &quot;conversation_assessment&quot;: {
+          &quot;status&quot;: &quot;verified_templates&quot;,
+          &quot;evidence&quot;: [
+            &quot;Refunded 300 USD cents for payment pay_alice.&quot;
+          ],
+          &quot;uncertainty&quot;: null
+        }
+      },
+      &quot;latency_ms&quot;: 18.055416992865503,
+      &quot;reproduction_command&quot;: &quot;agent-chaos run scenarios/03_after_timeout.yaml --provider scripted --agent corrected --seed 17&quot;,
+      &quot;trial_summary&quot;: {
+        &quot;total_trials&quot;: 1,
+        &quot;failure_count&quot;: 0
+      },
+      &quot;export_note&quot;: &quot;Portable command executes the embedded fixed scenario and same seed; recorded snapshots and tool evidence are unchanged.&quot;
+    }
+  },
+  &quot;commands&quot;: [
+    &quot;agent-chaos compare scenarios --provider scripted --trials 5 --seed 17 --out runs/no-api-validation&quot;,
+    &quot;agent-chaos rerun examples/timeout-flawed.json --provider scripted&quot;,
+    &quot;agent-chaos rerun examples/timeout-flawed.json --provider scripted --agent corrected&quot;
+  ],
+  &quot;limitations&quot;: &quot;Deterministic scripted agents exercise the real SQLite service, fault middleware, recorder, and verifier. These are not live LLM evaluations or independent statistical samples.&quot;
+}</pre></section></body></html>

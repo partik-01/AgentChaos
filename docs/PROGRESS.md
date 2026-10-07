@@ -114,3 +114,24 @@ A live smoke test is still awaiting a locally configured `OPENAI_API_KEY` and an
 account-available model ID. Neither was configured in the current session. The
 user was asked for the model ID and instructed to keep API credentials out of chat.
 No different task has been started while that input is pending.
+
+## Completed API-free validation
+
+The user does not have a model API key and requested testing without one.
+Ran five fresh trials of all eight development scenarios for each scripted agent,
+then reproduced the ambiguous-timeout failure and executed its corrected rerun:
+**82 target executions, zero model API calls**.
+
+- Flawed script: **30 failures / 40 trials**, 10 passes.
+- Corrected script: **0 failures / 40 trials**, 40 passes.
+- Both groups: zero harness errors and zero inconclusive runs.
+- Failure rerun retained the identical final ledger and fault schedule: 600 cents
+  refunded for a 300-cent request. Corrected rerun from the same initial snapshot:
+  one 300-cent refund, pass.
+- Saved measured counts and selected full evidence to
+  `examples/no-api-validation.json` and `examples/no-api-validation.html`.
+
+These are real executions of the offline SQLite/fault/verifier pipeline using
+scripted policies, not mocked payment state or live LLM reliability results.
+The live API smoke test is deferred because the user has no API credentials.
+No other implementation task was begun during this validation.

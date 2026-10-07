@@ -40,3 +40,12 @@ Full aggregate traces are created locally by the commands above. Only selected
 portable traces and aggregate counts are checked into Git. Source commits and
 dependency versions are recorded in the summary. These are public, small scripted
 regression demonstrations, not independent holdout or live-model benchmarks.
+
+## API-free follow-up validation
+
+A later requested offline run completed **82 target executions without any model
+API call**: five trials of each development scenario for both policies (80),
+followed by failure reproduction and corrected rerun (2). Flawed: 30 failures /
+40 trials. Corrected: 0 / 40. No harness errors or inconclusive runs occurred.
+View the [JSON evidence](no-api-validation.json) or [HTML report](no-api-validation.html).
+These remain deterministic scripted demonstrations, not live model benchmarks.
