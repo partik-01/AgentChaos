@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-chaos"
+version = "0.1.0"
+description = "Reproducible refund-agent reliability tests with authoritative evidence"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = ["pydantic>=2.7,<3", "PyYAML>=6,<7"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.8,<1"]
+openai = ["openai>=1.68,<3"]
+
+[project.scripts]
+agent-chaos = "agent_chaos.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
