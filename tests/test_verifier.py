@@ -1,0 +1,69 @@
+import copy
+
+from agent_chaos.schema import Scenario
+from agent_chaos.verifier import verify
+
+
+def case():
+    s = Scenario.model_validate({"name": "case", "description": "test", "expected_behavior": "refund once",
+        "payments": [{"payment_id": "p", "customer_id": "c", "amount_cents": 1000},
+                     {"payment_id": "other", "customer_id": "other", "amount_cents": 1000}],
+        "turns": [{"messages": [{"request_id": "r", "payment_id": "p", "customer_id": "c",
+                                 "amount_cents": 300, "text": "refund"}]}]})
+    initial = {"payments": [p.model_dump() for p in s.payments], "refunds": []}
+    refund = {"payment_id": "p", "customer_id": "c", "amount_cents": 300,
+              "refund_id": "rf_1", "idempotency_key": "request:r", "status": "succeeded"}
+    final = copy.deepcopy(initial)
+    final["refunds"] = [refund]
+    events = [{"index": 0, "observed": refund, "backend_events": [{"kind": "refund_committed"}]}]
+    responses = [{"claims": [{"request_id": "r", "payment_id": "p", "customer_id": "c",
+                              "amount_cents": 300, "status": "completed", "text": "Refunded."}]}]
+    return s, initial, final, events, responses
+
+
+def rules(result):
+    return {v["rule"] for v in result["violations"]}
+
+
+def test_independent_good_ledger():
+    assert verify(*case())["status"] == "pass"
+
+
+def test_duplicate_and_total_even_when_agent_says_success():
+    s, initial, final, events, responses = case()
+    final["refunds"].append(final["refunds"][0] | {"refund_id": "rf_2", "idempotency_key": "new"})
+    result = verify(s, initial, final, events, responses)
+    assert {"exact_total_refunded", "no_duplicate_economic_effect"} <= rules(result)
+    assert result["status"] == "agent_failure"
+
+
+def test_wrong_customer_and_unrelated_payment():
+    s, initial, final, events, responses = case()
+    final["refunds"][0].update(payment_id="other", customer_id="other")
+    assert {"correct_payment_and_customer", "unrelated_payments_unchanged"} <= rules(
+        verify(s, initial, final, events, responses))
+
+
+def test_false_completion_and_absence_are_not_confirmation():
+    s, initial, final, events, responses = case()
+    events[0]["observed"] = {"error": "timeout"}
+    assert "customer_outcome_agrees_with_evidence" in rules(verify(s, initial, final, events, responses))
+    responses[0]["claims"][0]["status"] = "not_completed"
+    assert "customer_outcome_agrees_with_evidence" in rules(verify(s, initial, final, events, responses))
+    responses[0]["claims"][0]["status"] = "uncertain"
+    assert verify(s, initial, final, events, responses)["status"] == "inconclusive"
+
+
+def test_harness_error_and_unassessed_language_never_pass():
+    assert verify(*case(), harness_error="provider unavailable")["status"] == "harness_error"
+    assert verify(*case(), conversation_assessment="unassessed")["status"] == "inconclusive"
+    s, initial, final, events, responses = case()
+    assert verify(s, initial, final, [], responses)["status"] == "harness_error"
+
+
+def test_balance_and_existing_state_corruption():
+    s, initial, final, events, responses = case()
+    final["refunds"][0]["amount_cents"] = 1100
+    assert "remaining_balance_not_exceeded" in rules(verify(s, initial, final, events, responses))
+    final["payments"][0]["amount_cents"] = 2000
+    assert "payment_records_immutable" in rules(verify(s, initial, final, events, responses))
