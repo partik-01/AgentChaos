@@ -95,21 +95,20 @@ def run_scenario(
         conversation_assessment=metadata.get("conversation_assessment", "unassessed"),
     )
     if agent_error:
-        result = {
-            "status": "agent_failure",
-            "violations": [
-                {
-                    "rule": "agent_output_valid",
-                    "expected": "valid final customer claims within the configured step budget",
-                    "observed": agent_error,
-                    "event_indices": [e["index"] for e in middleware.events],
-                }
-            ],
-            "conversation_assessment": {
-                "status": "unassessed",
-                "evidence": [],
-                "uncertainty": "invalid agent response",
-            },
+        result["status"] = "agent_failure"
+        result.pop("error", None)
+        result["violations"].append(
+            {
+                "rule": "agent_output_valid",
+                "expected": "valid final customer claims within the configured step budget",
+                "observed": agent_error,
+                "event_indices": [e["index"] for e in middleware.events],
+            }
+        )
+        result["conversation_assessment"] = {
+            "status": "unassessed",
+            "evidence": [],
+            "uncertainty": "invalid agent response",
         }
     scenario_data = scenario.model_dump()
     trace = {

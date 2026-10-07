@@ -52,24 +52,9 @@ def verify(
             }
         )
 
-    if harness_error:
-        return {
-            "status": "harness_error",
-            "violations": [],
-            "error": harness_error,
-            "conversation_assessment": {
-                "status": "unassessed",
-                "evidence": [],
-                "uncertainty": "execution failed",
-            },
-        }
+    execution_error = harness_error
     if not responses or not events:
-        return {
-            "status": "harness_error",
-            "violations": [],
-            "error": "missing execution evidence",
-            "conversation_assessment": {"status": "unassessed"},
-        }
+        execution_error = execution_error or "missing execution evidence"
     intents = expected_intents(scenario, initial)
     initial_ids = {r["refund_id"] for r in initial["refunds"]}
     new = [r for r in final["refunds"] if r["refund_id"] not in initial_ids]
@@ -181,7 +166,7 @@ def verify(
         if conversation_assessment == "deterministic_templates"
         else "Structured claims checked; natural-language text has not been assessed.",
     }
-    return {
+    result = {
         "status": "agent_failure"
         if violations
         else "inconclusive"
@@ -191,3 +176,12 @@ def verify(
         "expected_intents": intents,
         "conversation_assessment": conversational,
     }
+    if execution_error:
+        result["status"] = "harness_error"
+        result["error"] = execution_error
+        result["conversation_assessment"] = {
+            "status": "unassessed",
+            "evidence": [c["text"] for c in claims],
+            "uncertainty": "execution failed; financial evidence is still checked",
+        }
+    return result

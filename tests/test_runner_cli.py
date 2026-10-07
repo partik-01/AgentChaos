@@ -130,3 +130,48 @@ def test_maximum_length_request_id_can_form_a_valid_idempotency_key(tmp_path):
     data = load_scenario("scenarios/01_normal.yaml").model_dump()
     data["turns"][0]["messages"][0]["request_id"] = "r" * 200
     assert run_scenario(Scenario.model_validate(data), out=tmp_path)["result"]["status"] == "pass"
+
+
+def test_invalid_agent_output_retains_financial_consequences(tmp_path):
+    class DuplicateThenInvalid:
+        metadata = {"conversation_assessment": "unassessed"}
+
+        def run_turn(self, turn, tools):
+            m = turn.messages[0]
+            args = {
+                k: getattr(m, k)
+                for k in ("request_id", "payment_id", "customer_id", "amount_cents")
+            }
+            tools.call("create_refund", args | {"idempotency_key": "one"})
+            tools.call("create_refund", args | {"idempotency_key": "two"})
+            raise AgentFailure("invalid response after duplicate commit")
+
+    trace = run_scenario(
+        load_scenario("scenarios/01_normal.yaml"), out=tmp_path, agent=DuplicateThenInvalid()
+    )
+    assert trace["result"]["status"] == "agent_failure"
+    assert {"agent_output_valid", "exact_total_refunded", "no_duplicate_economic_effect"} <= {
+        v["rule"] for v in trace["result"]["violations"]
+    }
+
+
+def test_provider_error_preserves_ledger_evidence_without_counting_pass(tmp_path):
+    class ProviderFailure:
+        metadata = {"conversation_assessment": "unassessed"}
+
+        def run_turn(self, turn, tools):
+            m = turn.messages[0]
+            args = {
+                k: getattr(m, k)
+                for k in ("request_id", "payment_id", "customer_id", "amount_cents")
+            }
+            tools.call("create_refund", args | {"idempotency_key": "one"})
+            tools.call("create_refund", args | {"idempotency_key": "two"})
+            raise RuntimeError("provider connection failed")
+
+    trace = run_scenario(
+        load_scenario("scenarios/01_normal.yaml"), out=tmp_path, agent=ProviderFailure()
+    )
+    assert trace["result"]["status"] == "harness_error"
+    assert "exact_total_refunded" in {v["rule"] for v in trace["result"]["violations"]}
+    assert len(trace["final_state"]["refunds"]) == 2
