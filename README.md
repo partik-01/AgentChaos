@@ -105,6 +105,20 @@ They were evaluated only after the development suite and adapter tests passed.
 This small author-designed holdout is useful regression evidence, not an
 independent scientific benchmark; after publication these cases are public.
 
+## Workflow website
+
+For a simple explanation of the project, launch the included static walkthrough:
+
+```bash
+python3 -m http.server 8765 --bind 127.0.0.1 --directory examples
+```
+
+Open [the local workflow website](http://127.0.0.1:8765/). Step through a refund,
+compare the flawed and corrected policies, see actual ledger state versus agent
+observations, and open the measured reports. The page also explains the five
+components and provides offline CLI commands. It is educational playback of
+recorded examples; fresh test execution happens through the CLI.
+
 ## Optional live model
 
 ```bash

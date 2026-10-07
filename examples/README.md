@@ -49,3 +49,11 @@ followed by failure reproduction and corrected rerun (2). Flawed: 30 failures /
 40 trials. Corrected: 0 / 40. No harness errors or inconclusive runs occurred.
 View the [JSON evidence](no-api-validation.json) or [HTML report](no-api-validation.html).
 These remain deterministic scripted demonstrations, not live model benchmarks.
+
+## Workflow explainer website
+
+Serve this folder with `python3 -m http.server 8765 --bind 127.0.0.1 --directory examples`
+from the repository root, then open `http://127.0.0.1:8765/`.
+`index.html` and `workflow.js` provide a six-step explanation, a flawed/corrected
+policy switch, a project component map, links to these reports, and copyable CLI
+commands. The walkthrough explains recorded evidence; it does not execute tests.

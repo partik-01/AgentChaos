@@ -135,3 +135,27 @@ These are real executions of the offline SQLite/fault/verifier pipeline using
 scripted policies, not mocked payment state or live LLM reliability results.
 The live API smoke test is deferred because the user has no API credentials.
 No other implementation task was begun during this validation.
+
+## Completed workflow website task
+
+The user requested a simple website explaining the website and project workflow.
+Added `examples/index.html` and `examples/workflow.js` in sequential commits.
+The existing local server now opens the explainer at `http://127.0.0.1:8765/`.
+
+The page covers customer request, payment validation, refund commit, hidden timeout,
+agent handling, and independent verification. The flawed/corrected switch shows
+600 versus 300 cents alongside what the agent knows. Additional sections explain
+all five project components, the static website's role, report playback/reruns,
+uncertainty, saved evidence, and runnable offline CLI commands.
+
+Browser verification: timeout state is 300 committed cents with unknown agent
+outcome; flawed final state is 600 cents; corrected final state is 300 cents and
+pass. Verified direct step selection, restart, keyboard Enter navigation, policy
+switching, command copying, and report navigation/back. Confirmed all local report
+links, section anchors, and script references exist. CSS supplies narrow-screen
+layouts and reduced-motion handling; no mobile-device test is claimed.
+
+The page is educational playback, not a new agent-execution web backend. It is
+self-contained with no third-party asset dependencies or API key requirement.
+The preview was left open at the first step for the user. This task is complete;
+ask for the next task before beginning a different implementation.
