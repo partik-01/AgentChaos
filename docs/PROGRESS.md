@@ -84,3 +84,13 @@ GitHub push are complete. A possible next task is a live OpenAI adapter smoke te
 with an account-available model, if the user requests it. It has not been started.
 Continue the user's process: one task at a time, record verification and progress,
 commit each small improvement, and ask before beginning another task.
+
+## Local preview launch
+
+On 2026-10-07, the user requested launching the project for inspection.
+Started the static example-report server at `http://127.0.0.1:8765` and opened
+`timeout-flawed.html` in the visible Codex browser. Verified that the report shows
+300 cents expected, 600 cents observed, and the exact timeout/commit timeline.
+The browser tab and server were intentionally left available for the user.
+The MVP application remains a CLI with static HTML reporting; this preview serves
+recorded demonstration evidence and does not execute scenarios from a web UI.
