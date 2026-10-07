@@ -94,3 +94,23 @@ Started the static example-report server at `http://127.0.0.1:8765` and opened
 The browser tab and server were intentionally left available for the user.
 The MVP application remains a CLI with static HTML reporting; this preview serves
 recorded demonstration evidence and does not execute scenarios from a web UI.
+
+## OpenAI adapter validation checkpoint
+
+The user authorized moving to the next task after the preview launch.
+Installed the optional OpenAI extra locally (SDK 2.54.0) and verified adapter
+initialization and all four tool definitions. Added `tests/test_openai_sdk.py`,
+which exercises the actual SDK using an offline HTTP mock transport: creation
+commits behind a timeout, the model requests status reconciliation, and exactly
+one refund is recorded. The test checks serialized requests, tool outputs, token
+usage, raw response recording, and absence of the placeholder credential in traces.
+It intentionally retains an inconclusive result for unassessed model prose.
+
+Verification: dependency check passed; lint and formatting passed; **62 tests
+passed** with the OpenAI extra installed. The SDK transport test is skipped when
+that optional extra is absent; CI installs it. No external model API call was made.
+
+A live smoke test is still awaiting a locally configured `OPENAI_API_KEY` and an
+account-available model ID. Neither was configured in the current session. The
+user was asked for the model ID and instructed to keep API credentials out of chat.
+No different task has been started while that input is pending.
