@@ -137,3 +137,32 @@ def test_equal_aggregate_cannot_hide_duplicate_of_one_intent_and_missing_other()
         "exact_amount_per_request",
         "customer_outcome_agrees_with_evidence",
     } <= rules(result)
+
+
+def test_truthful_noncompletion_before_a_later_retry_is_not_a_false_claim():
+    s, initial, final, events, responses = case()
+    data = s.model_dump()
+    data["turns"].append(data["turns"][0])
+    s = Scenario.model_validate(data)
+    refund = final["refunds"][0]
+    events[0]["backend_events"] = [{"kind": "refund_committed", "refund": refund}]
+    early = responses[0]["claims"][0] | {"status": "not_completed"}
+    responses = [
+        {"turn": 0, "tool_event_end": 0, "claims": [early]},
+        {"turn": 1, "tool_event_end": 1, "claims": responses[0]["claims"]},
+    ]
+    # A rejected call supplied the first turn's observation; the later call committed.
+    events.insert(0, {"index": 0, "observed": {"error": "unavailable"}, "backend_events": []})
+    events[1]["index"] = 1
+    responses[0]["tool_event_end"] = 1
+    responses[1]["tool_event_end"] = 2
+    assert verify(s, initial, final, events, responses)["status"] == "pass"
+
+
+def test_noncompletion_claim_is_false_even_if_committed_amount_is_wrong():
+    s, initial, final, events, responses = case()
+    final["refunds"][0]["amount_cents"] = 200
+    responses[0]["claims"][0]["status"] = "not_completed"
+    assert "customer_outcome_agrees_with_evidence" in rules(
+        verify(s, initial, final, events, responses)
+    )

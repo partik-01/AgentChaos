@@ -115,7 +115,7 @@ def verify(
     if claimed_ids != {i["request_id"] for i in intents}:
         fail("all_requests_reported", [i["request_id"] for i in intents], sorted(claimed_ids))
     uncertain = False
-    for c in claims:
+    for response, c in ((r, c) for r in responses for c in r.get("claims", [])):
         intent = next((i for i in intents if i["request_id"] == c["request_id"]), None)
         if intent is None:
             fail("claim_authorized", "known request", c)
@@ -133,7 +133,19 @@ def verify(
             )
         ]
         observed_confirmation = []
-        response = next(r for r in responses if c in r.get("claims", []))
+        prior_events = events[: response.get("tool_event_end", len(events))]
+        prior_refund_ids = {
+            b["refund"]["refund_id"]
+            for e in prior_events
+            for b in e["backend_events"]
+            if b.get("kind") == "refund_committed" and "refund" in b
+        }
+        request_effects = [
+            r
+            for r in new
+            if r.get("request_id") == c["request_id"]
+            and ("tool_event_end" not in response or r["refund_id"] in prior_refund_ids)
+        ]
         for e in events[: response.get("tool_event_end", len(events))]:
             observed = e["observed"]
             candidates = observed.get("refunds", [observed])
@@ -153,7 +165,7 @@ def verify(
                 c,
                 observed_confirmation,
             )
-        if c["status"] == "not_completed" and matching:
+        if c["status"] == "not_completed" and request_effects:
             fail("customer_outcome_agrees_with_evidence", "refund completed or uncertainty", c)
         if c["status"] == "uncertain":
             uncertain = True
