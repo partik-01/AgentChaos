@@ -98,3 +98,7 @@ class ScriptedAgent:
                 self.memory[m.request_id] = answer
                 return answer
         return claim(m, "uncertain")
+
+
+class AgentFailure(Exception):
+    """The target executed but violated its output/budget contract."""

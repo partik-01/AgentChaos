@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import __version__
-from .agents import ScriptedAgent
+from .agents import AgentFailure, ScriptedAgent
 from .faults import FaultMiddleware
 from .payments import PaymentService
 from .schema import Scenario
@@ -40,6 +40,7 @@ def run_scenario(scenario: Scenario, agent_version="corrected", *, out: str | Pa
     middleware = FaultMiddleware(service, scenario.faults, scenario.seed)
     responses = []
     error = None
+    agent_error = None
     metadata = {"kind": provider, "version": agent_version, "model": model,
                 "usage": None, "cost_usd": None, "conversation_assessment": "unassessed"}
     try:
@@ -56,12 +57,20 @@ def run_scenario(scenario: Scenario, agent_version="corrected", *, out: str | Pa
             claims = agent.run_turn(turn, middleware)
             responses.append({"turn": index, "claims": [c.model_dump() for c in claims],
                               "tool_event_end": len(middleware.events)})
+    except AgentFailure as exc:
+        agent_error = str(exc)
     except Exception as exc:
         error = f"{type(exc).__name__}: {exc}"
     final = service.snapshot()
     service.close()
     result = verify(scenario, initial, final, middleware.events, responses, harness_error=error,
                     conversation_assessment=metadata.get("conversation_assessment", "unassessed"))
+    if agent_error:
+        result = {"status": "agent_failure", "violations": [{"rule": "agent_output_valid",
+                  "expected": "valid final customer claims within the configured step budget",
+                  "observed": agent_error, "event_indices": [e["index"] for e in middleware.events]}],
+                  "conversation_assessment": {"status": "unassessed", "evidence": [],
+                                              "uncertainty": "invalid agent response"}}
     scenario_data = scenario.model_dump()
     trace = {"trace_version": TRACE_VERSION, "run_id": run_id, "parent_run": parent_run,
              "created_at": datetime.now(timezone.utc).isoformat(), "package_version": __version__,
