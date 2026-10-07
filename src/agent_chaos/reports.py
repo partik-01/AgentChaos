@@ -44,7 +44,7 @@ def overview(data):
                 for e in data["tool_events"]
             ],
         )
-        return f"<section><h2 class='status'>{status}</h2><p>Run {html.escape(data['run_id'])}</p>{rules}</section><section><h2>Tool timeline</h2>{timeline}</section>"
+        return f"<section><h2 class='status'>{status}</h2><p>Run {html.escape(data['run_id'])}</p>{rules}</section><section class='timeline'><h2>Tool timeline</h2>{timeline}</section>"
     summary = data.get("summary", {})
     groups = (
         {"trials": summary}
@@ -114,7 +114,8 @@ h1{{letter-spacing:-1px}}section{{background:white;border:1px solid #dce2ed;bord
 padding:20px;margin:18px 0}}pre{{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.5}}
 small{{color:#516078}}table{{border-collapse:collapse;width:100%;font-size:13px}}
 th,td{{text-align:left;padding:12px;border-bottom:1px solid #dce2ed;vertical-align:top;overflow-wrap:anywhere}}
-th{{background:#eef2f8}}.scroll{{overflow-x:auto}}.status{{text-transform:uppercase;font-size:22px}}</style></head><body><h1>{html.escape(title)}</h1>
+th{{background:#eef2f8}}.scroll{{overflow-x:auto}}.status{{text-transform:uppercase;font-size:22px}}
+.timeline table{{min-width:750px}}.timeline th,.timeline td:nth-child(-n+4){{white-space:nowrap}}</style></head><body><h1>{html.escape(title)}</h1>
 <small>Simulated payments only · authoritative business evidence · trace format v1</small>
 {overview(data)}{body}</body></html>"""
 
