@@ -53,18 +53,34 @@ broken execution as a pass.
 - These are scripted demonstration counts, not live-model benchmark claims.
 - Reports from these executions exist in ignored local `runs/` directories.
 
+## Release evidence completed
+
+- Added portable measured traces and static HTML under `examples/`:
+  normal flawed baseline, timeout failure, corrected rerun, and benchmark summary.
+- Verified playback/export of the checked-in failure trace and reran both policies
+  from its recorded initial snapshot: flawed commits 600 cents; corrected commits
+  the expected 300 cents.
+- Visually inspected the HTML report in a browser and refined the tool timeline
+  so tool names and fault labels remain readable. Temporary preview was stopped.
+- Final post-review checks: **61 tests passed**, lint and format checks passed.
+
 ## GitHub status
 
 Remote: https://github.com/partik-01/ChaoticAgent.git
 
-Pushed `main` successfully through commit `27380f3`.
-The latest financial-evidence fix and this checkpoint are committed locally;
-they still need to be pushed. Git history records all individual improvements.
+All release implementation and example commits were pushed to `main`, through
+`c6664b4`. Local and remote commit hashes were verified identical. This progress
+checkpoint is committed and pushed as the final documentation update.
 
-## Next authorized step — in progress
+GitHub Actions status could not be verified: the public runs API returned HTTP
+404, and the GitHub CLI is unavailable locally. The workflow is committed for
+Python 3.11, 3.12, and 3.13, but only local Python 3.12 execution is claimed.
+No live OpenAI API calls or live-model benchmark claims were made.
 
-The user authorized rechecking and continuing to the next step. Release checks
-are complete. Next: save portable example JSON/HTML, verify their playback and
-fixed-agent rerun, then push remaining commits and verify GitHub synchronization.
+## Next task — awaiting user direction
 
-Remote CI and a live-model smoke test have not been claimed as completed.
+The offline MVP, optional experiments, release recheck, portable evidence, and
+GitHub push are complete. A possible next task is a live OpenAI adapter smoke test
+with an account-available model, if the user requests it. It has not been started.
+Continue the user's process: one task at a time, record verification and progress,
+commit each small improvement, and ask before beginning another task.
