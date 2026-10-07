@@ -15,7 +15,7 @@ def service():
     s.close()
 
 
-ARGS = dict(payment_id="p", customer_id="c", amount_cents=300, idempotency_key="k")
+ARGS = dict(request_id="r", payment_id="p", customer_id="c", amount_cents=300, idempotency_key="k")
 
 
 @pytest.mark.parametrize(

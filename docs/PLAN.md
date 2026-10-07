@@ -20,7 +20,7 @@ and usability changes). First establish the refund contract, then build and test
 All money is positive integer USD cents; no floats. Payments belong to one
 customer. Refunds are immediately committed, immutable, successful ledger entries.
 SQLite transactions enforce remaining balance. `create_refund(payment_id,
-customer_id, amount_cents, idempotency_key)` validates ownership and available
+customer_id, amount_cents, idempotency_key, request_id)` validates ownership and available
 balance. Keys are global: identical parameters return the original refund even
 when remaining balance is now lower; different parameters produce a conflict.
 Reads (`get_payment`, `get_refund_status` by key, `list_refunds`) are strongly

@@ -39,6 +39,7 @@ class FakeClient:
 def test_real_adapter_tool_loop_with_mocked_provider():
     scenario = load_scenario("scenarios/03_after_timeout.yaml")
     refund_args = dict(
+        request_id="refund-001",
         payment_id="pay_alice",
         customer_id="alice",
         amount_cents=300,

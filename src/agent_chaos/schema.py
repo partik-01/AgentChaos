@@ -89,6 +89,7 @@ def load_scenario(path: str | Path) -> Scenario:
 
 
 class CreateRefund(StrictModel):
+    request_id: Identifier
     payment_id: Identifier
     customer_id: Identifier
     amount_cents: Cents

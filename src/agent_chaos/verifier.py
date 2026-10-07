@@ -80,7 +80,11 @@ def verify(
         if old.get(r["refund_id"]) != r:
             fail("existing_refunds_immutable", r, old.get(r["refund_id"]))
     authorized = {(i["payment_id"], i["customer_id"]) for i in intents if i["expected_cents"]}
+    intents_by_id = {i["request_id"]: i for i in intents}
     for r in new:
+        intent = intents_by_id.get(r.get("request_id"))
+        if intent and any(r[k] != intent[k] for k in ("payment_id", "customer_id")):
+            fail("correct_payment_and_customer", intent, r)
         if (r["payment_id"], r["customer_id"]) not in authorized:
             fail("correct_payment_and_customer", sorted(authorized), r)
         if r["payment_id"] not in {i["payment_id"] for i in intents}:
@@ -96,13 +100,23 @@ def verify(
     ):
         fail("exact_total_refunded", dict(expected_totals), dict(actual_totals))
     expected_effects = Counter(
-        (i["payment_id"], i["customer_id"], i["amount_cents"])
+        (i["request_id"], i["payment_id"], i["customer_id"], i["amount_cents"])
         for i in intents
         if i["expected_cents"]
     )
-    observed_effects = Counter((r["payment_id"], r["customer_id"], r["amount_cents"]) for r in new)
+    observed_effects = Counter(
+        (r.get("request_id"), r["payment_id"], r["customer_id"], r["amount_cents"]) for r in new
+    )
     if any(n > expected_effects[effect] for effect, n in observed_effects.items()):
         fail("no_duplicate_economic_effect", str(expected_effects), str(observed_effects))
+    expected_by_request = {i["request_id"]: i["expected_cents"] for i in intents}
+    actual_by_request = defaultdict(int)
+    for r in new:
+        actual_by_request[r.get("request_id")] += r["amount_cents"]
+    if any(
+        actual_by_request.get(k, 0) != amount for k, amount in expected_by_request.items()
+    ) or any(k not in expected_by_request for k in actual_by_request):
+        fail("exact_amount_per_request", expected_by_request, dict(actual_by_request))
     totals = defaultdict(int)
     for r in final["refunds"]:
         totals[r["payment_id"]] += r["amount_cents"]
@@ -121,13 +135,17 @@ def verify(
         if intent is None:
             fail("claim_authorized", "known request", c)
             continue
-        if any(c[k] != intent[k] for k in ("payment_id", "customer_id", "amount_cents")):
+        if any(
+            c[k] != intent[k] for k in ("request_id", "payment_id", "customer_id", "amount_cents")
+        ):
             fail("claim_matches_request", intent, c)
         matching = [
             r
             for r in new
             if intent["expected_cents"]
-            and all(r[k] == c[k] for k in ("payment_id", "customer_id", "amount_cents"))
+            and all(
+                r[k] == c[k] for k in ("request_id", "payment_id", "customer_id", "amount_cents")
+            )
         ]
         observed_confirmation = []
         response = next(r for r in responses if c in r.get("claims", []))
@@ -136,7 +154,10 @@ def verify(
             candidates = observed.get("refunds", [observed])
             if any(
                 r.get("status") == "succeeded"
-                and all(r.get(k) == c[k] for k in ("payment_id", "customer_id", "amount_cents"))
+                and all(
+                    r.get(k) == c[k]
+                    for k in ("request_id", "payment_id", "customer_id", "amount_cents")
+                )
                 for r in candidates
             ):
                 observed_confirmation.append(e["index"])

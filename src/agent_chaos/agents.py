@@ -41,7 +41,8 @@ def claim(message: Message, status: str) -> Claim:
 
 def confirmed(result: dict, message: Message) -> bool:
     return result.get("status") == "succeeded" and all(
-        result.get(k) == getattr(message, k) for k in ("payment_id", "customer_id", "amount_cents")
+        result.get(k) == getattr(message, k)
+        for k in ("request_id", "payment_id", "customer_id", "amount_cents")
     )
 
 
@@ -87,6 +88,7 @@ class ScriptedAgent:
             return claim(m, "not_completed")
         key = f"request:{m.request_id}"
         args = {
+            "request_id": m.request_id,
             "payment_id": m.payment_id,
             "customer_id": m.customer_id,
             "amount_cents": m.amount_cents,

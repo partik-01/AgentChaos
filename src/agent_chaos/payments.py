@@ -24,7 +24,8 @@ class PaymentService:
             CREATE TABLE IF NOT EXISTS refunds (
                 refund_id TEXT PRIMARY KEY, payment_id TEXT NOT NULL REFERENCES payments,
                 customer_id TEXT NOT NULL, amount_cents INTEGER NOT NULL CHECK(amount_cents > 0),
-                idempotency_key TEXT NOT NULL UNIQUE, status TEXT NOT NULL CHECK(status='succeeded'));
+                idempotency_key TEXT NOT NULL UNIQUE, status TEXT NOT NULL CHECK(status='succeeded'),
+                request_id TEXT NOT NULL);
         """)
         self.events: list[dict] = []
 
@@ -49,7 +50,7 @@ class PaymentService:
             for r in snapshot["refunds"]:
                 self.db.execute(
                     """INSERT INTO refunds VALUES
-                    (:refund_id,:payment_id,:customer_id,:amount_cents,:idempotency_key,:status)""",
+                    (:refund_id,:payment_id,:customer_id,:amount_cents,:idempotency_key,:status,:request_id)""",
                     r,
                 )
             self.db.execute("COMMIT")
@@ -95,13 +96,19 @@ class PaymentService:
         }
 
     def create_refund(
-        self, payment_id: str, customer_id: str, amount_cents: int, idempotency_key: str
+        self,
+        payment_id: str,
+        customer_id: str,
+        amount_cents: int,
+        idempotency_key: str,
+        request_id: str,
     ) -> dict:
         args = CreateRefund(
             payment_id=payment_id,
             customer_id=customer_id,
             amount_cents=amount_cents,
             idempotency_key=idempotency_key,
+            request_id=request_id,
         )
         self.db.execute("BEGIN IMMEDIATE")
         try:
@@ -109,7 +116,7 @@ class PaymentService:
             if existing["status"] != "not_found":
                 if any(
                     existing[k] != getattr(args, k)
-                    for k in ("payment_id", "customer_id", "amount_cents")
+                    for k in ("request_id", "payment_id", "customer_id", "amount_cents")
                 ):
                     raise PaymentError("idempotency_conflict")
                 self.db.execute("COMMIT")
@@ -123,7 +130,7 @@ class PaymentService:
             refund = args.model_dump() | {"refund_id": f"rf_{number:06d}", "status": "succeeded"}
             self.db.execute(
                 """INSERT INTO refunds VALUES
-                (:refund_id,:payment_id,:customer_id,:amount_cents,:idempotency_key,:status)""",
+                (:refund_id,:payment_id,:customer_id,:amount_cents,:idempotency_key,:status,:request_id)""",
                 refund,
             )
             self.db.execute("COMMIT")

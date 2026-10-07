@@ -8,12 +8,12 @@ that rejects floats, booleans, and numeric strings. Identifiers are 1–200 char
 | Tool | Arguments | Success result |
 | --- | --- | --- |
 | `get_payment` | `payment_id`, `customer_id` | Payment, `refunded_cents`, `remaining_cents` |
-| `create_refund` | `payment_id`, `customer_id`, `amount_cents`, `idempotency_key` | Immutable refund with `refund_id`, parameters, `status: succeeded` |
+| `create_refund` | `request_id`, `payment_id`, `customer_id`, `amount_cents`, `idempotency_key` | Immutable refund with `refund_id`, parameters, `status: succeeded` |
 | `get_refund_status` | `idempotency_key` | Refund, or `status: not_found` with the key |
 | `list_refunds` | `payment_id`, `customer_id` | `{refunds: [...]}` for that payment |
 
 Keys are globally unique across payments. Identical retries return the original
-refund before checking the current remaining balance. Different payment, customer,
+refund before checking the current remaining balance. Different request ID, payment, customer,
 or amount with the same key raises `idempotency_conflict`. Creation validates
 ownership and remaining balance inside `BEGIN IMMEDIATE`; concurrent writers
 cannot overdraw. `customer_mismatch`, `payment_not_found`, and
@@ -60,7 +60,10 @@ An unknown payment, wrong customer, or excess amount is expected to have no effe
 This is a declared, narrow policy: simultaneous distinct intents must be served
 in this order; the scenario editor should not imply a different policy in prose.
 
-Financial checks use snapshots and refund multiset/counts, independently of the
+Refund rows carry an explicit request ID independently of their idempotency key.
+The service does not make request IDs unique: a buggy retry with a new key must
+remain observable. Financial checks use snapshots and refund multiset/counts per
+request ID, independently of the
 agent's structured claims. Completion claims require a matching refund and a
 matching succeeded observation **before the response**. `not_found` is not proof
 of a missing refund. An otherwise correct ledger with uncertainty is inconclusive.

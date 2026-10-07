@@ -31,6 +31,7 @@ def case():
     )
     initial = {"payments": [p.model_dump() for p in s.payments], "refunds": []}
     refund = {
+        "request_id": "r",
         "payment_id": "p",
         "customer_id": "c",
         "amount_cents": 300,
@@ -117,3 +118,22 @@ def test_future_tool_confirmation_cannot_justify_earlier_claim():
     assert "customer_outcome_agrees_with_evidence" in rules(
         verify(s, initial, final, events, responses)
     )
+
+
+def test_equal_aggregate_cannot_hide_duplicate_of_one_intent_and_missing_other():
+    s, initial, final, events, responses = case()
+    data = s.model_dump()
+    second = data["turns"][0]["messages"][0] | {"request_id": "second"}
+    data["turns"].append({"messages": [second]})
+    s = Scenario.model_validate(data)
+    final["refunds"].append(
+        final["refunds"][0] | {"refund_id": "rf_2", "idempotency_key": "different"}
+    )
+    responses.append({"claims": [responses[0]["claims"][0] | {"request_id": "second"}]})
+    result = verify(s, initial, final, events, responses)
+    assert "exact_total_refunded" not in rules(result)  # Aggregate is 600, as requested.
+    assert {
+        "no_duplicate_economic_effect",
+        "exact_amount_per_request",
+        "customer_outcome_agrees_with_evidence",
+    } <= rules(result)
