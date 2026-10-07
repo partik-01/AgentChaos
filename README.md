@@ -145,6 +145,21 @@ These counts are deterministic demonstration results, not LLM reliability rates
 or confidence estimates. Repeated identical scripts offer regression evidence;
 they do not provide independent statistical samples.
 
+## Optional experiments after the MVP
+
+```bash
+agent-chaos generate scenarios/01_normal.yaml --output runs/generated.yaml
+agent-chaos minimize runs/<failed-run-id>/trace.json --trials 3 --budget 60
+agent-chaos study scenarios --agent flawed --budget 24 --seed 17 --out runs/study
+```
+
+Generation is scripted offline by default; `--provider openai --model ...` uses
+an optional proposal agent. The minimizer removes faults/messages/turns only when
+the same violated rule survives every trial. The study compares fixed cases,
+generated proposals, and seeded random faults with equal target-execution counts.
+Generation overhead is additional and recorded. See [experiment semantics,
+budgets, and limitations](docs/EXPERIMENTS.md).
+
 ## Evidence and limitations
 
 Traces record initial/final database snapshots, all user messages and responses,
