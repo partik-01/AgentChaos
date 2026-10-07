@@ -1,0 +1,36 @@
+version: 1
+name: 04_ambiguous_retry
+description: A committed refund times out and initial reconciliation reads fail.
+expected_behavior: Retry creation with the same key and parameters; exactly one refund.
+seed: 17
+split: development
+payments:
+- payment_id: pay_alice
+  customer_id: alice
+  amount_cents: 1000
+- payment_id: pay_bob
+  customer_id: bob
+  amount_cents: 2000
+turns:
+- messages:
+  - request_id: refund-001
+    payment_id: pay_alice
+    customer_id: alice
+    amount_cents: 300
+    text: Please refund 300 USD cents from pay_alice.
+faults:
+- tool: create_refund
+  occurrence: 1
+  kind: after_timeout
+- tool: get_refund_status
+  occurrence: 1
+  kind: before_failure
+- tool: get_refund_status
+  occurrence: 2
+  kind: before_failure
+- tool: get_refund_status
+  occurrence: 3
+  kind: before_failure
+- tool: list_refunds
+  occurrence: 1
+  kind: rate_limit

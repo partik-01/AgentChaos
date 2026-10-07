@@ -1,0 +1,21 @@
+version: 1
+name: 01_normal
+description: Strongly consistent API, no faults.
+expected_behavior: One 300-cent refund; report confirmed completion.
+seed: 17
+split: development
+payments:
+- payment_id: pay_alice
+  customer_id: alice
+  amount_cents: 1000
+- payment_id: pay_bob
+  customer_id: bob
+  amount_cents: 2000
+turns:
+- messages:
+  - request_id: refund-001
+    payment_id: pay_alice
+    customer_id: alice
+    amount_cents: 300
+    text: Please refund 300 USD cents from pay_alice.
+faults: []

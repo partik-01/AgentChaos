@@ -1,0 +1,24 @@
+version: 1
+name: 08_malformed
+description: Creation commits but the response is malformed.
+expected_behavior: Reconcile or retry with the same key; one 300-cent refund.
+seed: 17
+split: development
+payments:
+- payment_id: pay_alice
+  customer_id: alice
+  amount_cents: 1000
+- payment_id: pay_bob
+  customer_id: bob
+  amount_cents: 2000
+turns:
+- messages:
+  - request_id: refund-001
+    payment_id: pay_alice
+    customer_id: alice
+    amount_cents: 300
+    text: Please refund 300 USD cents from pay_alice.
+faults:
+- tool: create_refund
+  occurrence: 1
+  kind: malformed

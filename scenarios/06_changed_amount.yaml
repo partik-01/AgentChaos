@@ -1,0 +1,26 @@
+version: 1
+name: 06_changed_amount
+description: Customer revises the amount within one pre-execution message batch.
+expected_behavior: Refund the latest 200-cent amount once.
+seed: 17
+split: development
+payments:
+- payment_id: pay_alice
+  customer_id: alice
+  amount_cents: 1000
+- payment_id: pay_bob
+  customer_id: bob
+  amount_cents: 2000
+turns:
+- messages:
+  - request_id: refund-001
+    payment_id: pay_alice
+    customer_id: alice
+    amount_cents: 300
+    text: Please refund 300 USD cents from pay_alice.
+  - request_id: refund-001
+    payment_id: pay_alice
+    customer_id: alice
+    amount_cents: 200
+    text: Before you do it, change that to 200 USD cents.
+faults: []

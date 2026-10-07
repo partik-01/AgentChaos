@@ -1,0 +1,26 @@
+version: 1
+name: 05_delayed_visibility
+description: Completed refund is absent from the next three status/list reads.
+expected_behavior: Do not interpret not_found as failure; confirm or report uncertainty,
+  never duplicate.
+seed: 17
+split: development
+payments:
+- payment_id: pay_alice
+  customer_id: alice
+  amount_cents: 1000
+- payment_id: pay_bob
+  customer_id: bob
+  amount_cents: 2000
+turns:
+- messages:
+  - request_id: refund-001
+    payment_id: pay_alice
+    customer_id: alice
+    amount_cents: 300
+    text: Please refund 300 USD cents from pay_alice.
+faults:
+- tool: create_refund
+  occurrence: 1
+  kind: visibility_delay
+  hidden_reads: 3
