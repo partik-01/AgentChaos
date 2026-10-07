@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
 
 Cents = Annotated[StrictInt, Field(gt=0)]
 Identifier = Annotated[str, Field(min_length=1, max_length=200)]
+IdempotencyKey = Annotated[str, Field(min_length=1, max_length=256)]
 ToolName = Literal["get_payment", "create_refund", "get_refund_status", "list_refunds"]
 
 
@@ -93,7 +94,7 @@ class CreateRefund(StrictModel):
     payment_id: Identifier
     customer_id: Identifier
     amount_cents: Cents
-    idempotency_key: Identifier
+    idempotency_key: IdempotencyKey
 
 
 class GetPayment(StrictModel):
@@ -102,7 +103,7 @@ class GetPayment(StrictModel):
 
 
 class GetStatus(StrictModel):
-    idempotency_key: Identifier
+    idempotency_key: IdempotencyKey
 
 
 TOOL_MODELS = {

@@ -3,7 +3,8 @@
 Python methods and model tools share these schemas. There is no real payment API,
 HTTP server, authentication, pending settlement, cancellation, or FX support.
 Every amount is a **positive integer USD cent amount**, with strict validation
-that rejects floats, booleans, and numeric strings. Identifiers are 1–200 characters.
+that rejects floats, booleans, and numeric strings. Identifiers are 1–200 characters; idempotency keys are 1–256 characters to
+allow a prefix around a maximum-length request ID.
 
 | Tool | Arguments | Success result |
 | --- | --- | --- |

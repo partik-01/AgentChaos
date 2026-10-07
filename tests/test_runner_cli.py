@@ -122,3 +122,11 @@ def test_repeated_request_after_uncertainty_reconciles_even_when_balance_is_lowe
     calls = [e for e in trace["tool_events"] if e["tool"] == "create_refund"]
     assert len(calls) == 4
     assert len({e["arguments"]["idempotency_key"] for e in calls}) == 1
+
+
+def test_maximum_length_request_id_can_form_a_valid_idempotency_key(tmp_path):
+    from agent_chaos.schema import Scenario
+
+    data = load_scenario("scenarios/01_normal.yaml").model_dump()
+    data["turns"][0]["messages"][0]["request_id"] = "r" * 200
+    assert run_scenario(Scenario.model_validate(data), out=tmp_path)["result"]["status"] == "pass"
