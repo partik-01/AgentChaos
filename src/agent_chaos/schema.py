@@ -1,4 +1,5 @@
 """Strict, versioned scenario and tool contracts. Money is always integer cents."""
+
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -73,7 +74,10 @@ class Scenario(StrictModel):
                 if m.request_id in seen and seen[m.request_id] != identity:
                     raise ValueError("request ID cannot change payment/customer")
                 seen[m.request_id] = identity
-                if m.request_id in executed_amounts and executed_amounts[m.request_id] != m.amount_cents:
+                if (
+                    m.request_id in executed_amounts
+                    and executed_amounts[m.request_id] != m.amount_cents
+                ):
                     raise ValueError("amount changes after an execution turn are unsupported")
             for m in turn.messages:
                 executed_amounts[m.request_id] = m.amount_cents

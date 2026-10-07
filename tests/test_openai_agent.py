@@ -16,8 +16,12 @@ class Response:
         self.output_text = text
 
     def model_dump(self, **kwargs):
-        return {"output": self.output, "usage": {"input_tokens": 10, "output_tokens": 5},
-                "model": "mock-model", "status": "completed"}
+        return {
+            "output": self.output,
+            "usage": {"input_tokens": 10, "output_tokens": 5},
+            "model": "mock-model",
+            "status": "completed",
+        }
 
 
 class FakeClient:
@@ -34,16 +38,40 @@ class FakeClient:
 
 def test_real_adapter_tool_loop_with_mocked_provider():
     scenario = load_scenario("scenarios/03_after_timeout.yaml")
-    refund_args = dict(payment_id="pay_alice", customer_id="alice", amount_cents=300,
-                       idempotency_key="request:refund-001")
+    refund_args = dict(
+        payment_id="pay_alice",
+        customer_id="alice",
+        amount_cents=300,
+        idempotency_key="request:refund-001",
+    )
+
     def call(name, args, call_id):
-        return Response([{"type": "function_call", "name": name,
-                          "arguments": json.dumps(args), "call_id": call_id}])
-    answer = dict(request_id="refund-001", payment_id="pay_alice", customer_id="alice",
-                  amount_cents=300, status="completed", text="Refunded 300 cents.")
-    client = FakeClient([call("create_refund", refund_args, "1"),
-                         call("get_refund_status", {"idempotency_key": "request:refund-001"}, "2"),
-                         Response([], json.dumps({"claims": [answer]}))])
+        return Response(
+            [
+                {
+                    "type": "function_call",
+                    "name": name,
+                    "arguments": json.dumps(args),
+                    "call_id": call_id,
+                }
+            ]
+        )
+
+    answer = dict(
+        request_id="refund-001",
+        payment_id="pay_alice",
+        customer_id="alice",
+        amount_cents=300,
+        status="completed",
+        text="Refunded 300 cents.",
+    )
+    client = FakeClient(
+        [
+            call("create_refund", refund_args, "1"),
+            call("get_refund_status", {"idempotency_key": "request:refund-001"}, "2"),
+            Response([], json.dumps({"claims": [answer]})),
+        ]
+    )
     service = PaymentService()
     service.restore({"payments": [p.model_dump() for p in scenario.payments], "refunds": []})
     middleware = FaultMiddleware(service, scenario.faults, 17)

@@ -5,19 +5,56 @@ from agent_chaos.verifier import verify
 
 
 def case():
-    s = Scenario.model_validate({"name": "case", "description": "test", "expected_behavior": "refund once",
-        "payments": [{"payment_id": "p", "customer_id": "c", "amount_cents": 1000},
-                     {"payment_id": "other", "customer_id": "other", "amount_cents": 1000}],
-        "turns": [{"messages": [{"request_id": "r", "payment_id": "p", "customer_id": "c",
-                                 "amount_cents": 300, "text": "refund"}]}]})
+    s = Scenario.model_validate(
+        {
+            "name": "case",
+            "description": "test",
+            "expected_behavior": "refund once",
+            "payments": [
+                {"payment_id": "p", "customer_id": "c", "amount_cents": 1000},
+                {"payment_id": "other", "customer_id": "other", "amount_cents": 1000},
+            ],
+            "turns": [
+                {
+                    "messages": [
+                        {
+                            "request_id": "r",
+                            "payment_id": "p",
+                            "customer_id": "c",
+                            "amount_cents": 300,
+                            "text": "refund",
+                        }
+                    ]
+                }
+            ],
+        }
+    )
     initial = {"payments": [p.model_dump() for p in s.payments], "refunds": []}
-    refund = {"payment_id": "p", "customer_id": "c", "amount_cents": 300,
-              "refund_id": "rf_1", "idempotency_key": "request:r", "status": "succeeded"}
+    refund = {
+        "payment_id": "p",
+        "customer_id": "c",
+        "amount_cents": 300,
+        "refund_id": "rf_1",
+        "idempotency_key": "request:r",
+        "status": "succeeded",
+    }
     final = copy.deepcopy(initial)
     final["refunds"] = [refund]
     events = [{"index": 0, "observed": refund, "backend_events": [{"kind": "refund_committed"}]}]
-    responses = [{"claims": [{"request_id": "r", "payment_id": "p", "customer_id": "c",
-                              "amount_cents": 300, "status": "completed", "text": "Refunded."}]}]
+    responses = [
+        {
+            "claims": [
+                {
+                    "request_id": "r",
+                    "payment_id": "p",
+                    "customer_id": "c",
+                    "amount_cents": 300,
+                    "status": "completed",
+                    "text": "Refunded.",
+                }
+            ]
+        }
+    ]
     return s, initial, final, events, responses
 
 
@@ -41,15 +78,20 @@ def test_wrong_customer_and_unrelated_payment():
     s, initial, final, events, responses = case()
     final["refunds"][0].update(payment_id="other", customer_id="other")
     assert {"correct_payment_and_customer", "unrelated_payments_unchanged"} <= rules(
-        verify(s, initial, final, events, responses))
+        verify(s, initial, final, events, responses)
+    )
 
 
 def test_false_completion_and_absence_are_not_confirmation():
     s, initial, final, events, responses = case()
     events[0]["observed"] = {"error": "timeout"}
-    assert "customer_outcome_agrees_with_evidence" in rules(verify(s, initial, final, events, responses))
+    assert "customer_outcome_agrees_with_evidence" in rules(
+        verify(s, initial, final, events, responses)
+    )
     responses[0]["claims"][0]["status"] = "not_completed"
-    assert "customer_outcome_agrees_with_evidence" in rules(verify(s, initial, final, events, responses))
+    assert "customer_outcome_agrees_with_evidence" in rules(
+        verify(s, initial, final, events, responses)
+    )
     responses[0]["claims"][0]["status"] = "uncertain"
     assert verify(s, initial, final, events, responses)["status"] == "inconclusive"
 
@@ -72,4 +114,6 @@ def test_balance_and_existing_state_corruption():
 def test_future_tool_confirmation_cannot_justify_earlier_claim():
     s, initial, final, events, responses = case()
     responses[0]["tool_event_end"] = 0
-    assert "customer_outcome_agrees_with_evidence" in rules(verify(s, initial, final, events, responses))
+    assert "customer_outcome_agrees_with_evidence" in rules(
+        verify(s, initial, final, events, responses)
+    )

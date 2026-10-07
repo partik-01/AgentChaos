@@ -1,4 +1,5 @@
 """Deterministic demonstrations; these agents are scripts, not LLM benchmarks."""
+
 from .schema import Claim, Message, Turn
 
 CORRECTED_PROMPT = """You are a support agent in a SIMULATED refund environment.
@@ -28,15 +29,20 @@ def claim(message: Message, status: str) -> Claim:
         "not_completed": f"No refund completed for payment {message.payment_id}.",
         "uncertain": f"I cannot verify whether the refund for payment {message.payment_id} completed.",
     }
-    return Claim(**{k: getattr(message, k) for k in
-                    ("request_id", "payment_id", "customer_id", "amount_cents")},
-                 status=status, text=sentences[status])
+    return Claim(
+        **{
+            k: getattr(message, k)
+            for k in ("request_id", "payment_id", "customer_id", "amount_cents")
+        },
+        status=status,
+        text=sentences[status],
+    )
 
 
 def confirmed(result: dict, message: Message) -> bool:
-    return (result.get("status") == "succeeded"
-            and all(result.get(k) == getattr(message, k) for k in
-                    ("payment_id", "customer_id", "amount_cents")))
+    return result.get("status") == "succeeded" and all(
+        result.get(k) == getattr(message, k) for k in ("payment_id", "customer_id", "amount_cents")
+    )
 
 
 class ScriptedAgent:
@@ -46,10 +52,16 @@ class ScriptedAgent:
         self.version = version
         self.memory: dict[str, Claim] = {}
         self.counter = 0
-        self.metadata = {"kind": "scripted", "version": version, "model": None,
-                         "prompt_version": "1", "prompt": CORRECTED_PROMPT if version == "corrected"
-                         else FLAWED_PROMPT, "usage": {"input_tokens": 0, "output_tokens": 0},
-                         "cost_usd": 0.0, "conversation_assessment": "deterministic_templates"}
+        self.metadata = {
+            "kind": "scripted",
+            "version": version,
+            "model": None,
+            "prompt_version": "1",
+            "prompt": CORRECTED_PROMPT if version == "corrected" else FLAWED_PROMPT,
+            "usage": {"input_tokens": 0, "output_tokens": 0},
+            "cost_usd": 0.0,
+            "conversation_assessment": "deterministic_templates",
+        }
 
     def run_turn(self, turn: Turn, tools) -> list[Claim]:
         selected = {}
@@ -61,14 +73,24 @@ class ScriptedAgent:
     def _refund(self, m: Message, tools) -> Claim:
         if self.version == "corrected" and m.request_id in self.memory:
             return self.memory[m.request_id]
-        payment = tools.call("get_payment", {"payment_id": m.payment_id, "customer_id": m.customer_id})
+        payment = tools.call(
+            "get_payment", {"payment_id": m.payment_id, "customer_id": m.customer_id}
+        )
         if "error" in payment:
-            status = "not_completed" if payment["error"] in ("customer_mismatch", "payment_not_found") else "uncertain"
+            status = (
+                "not_completed"
+                if payment["error"] in ("customer_mismatch", "payment_not_found")
+                else "uncertain"
+            )
             return claim(m, status)
         if payment.get("remaining_cents", 0) < m.amount_cents:
             return claim(m, "not_completed")
         key = f"request:{m.request_id}"
-        args = {"payment_id": m.payment_id, "customer_id": m.customer_id, "amount_cents": m.amount_cents}
+        args = {
+            "payment_id": m.payment_id,
+            "customer_id": m.customer_id,
+            "amount_cents": m.amount_cents,
+        }
         for _ in range(3):
             if self.version == "flawed":
                 self.counter += 1
@@ -78,7 +100,11 @@ class ScriptedAgent:
                 answer = claim(m, "completed")
                 self.memory[m.request_id] = answer
                 return answer
-            if result.get("error") in ("insufficient_balance", "customer_mismatch", "idempotency_conflict"):
+            if result.get("error") in (
+                "insufficient_balance",
+                "customer_mismatch",
+                "idempotency_conflict",
+            ):
                 return claim(m, "not_completed")
             if self.version == "flawed":
                 if result.get("status") == "pending":
@@ -92,8 +118,13 @@ class ScriptedAgent:
                     answer = claim(m, "completed")
                     self.memory[m.request_id] = answer
                     return answer
-            listed = tools.call("list_refunds", {"payment_id": m.payment_id, "customer_id": m.customer_id})
-            if any(r.get("idempotency_key") == key and confirmed(r, m) for r in listed.get("refunds", [])):
+            listed = tools.call(
+                "list_refunds", {"payment_id": m.payment_id, "customer_id": m.customer_id}
+            )
+            if any(
+                r.get("idempotency_key") == key and confirmed(r, m)
+                for r in listed.get("refunds", [])
+            ):
                 answer = claim(m, "completed")
                 self.memory[m.request_id] = answer
                 return answer

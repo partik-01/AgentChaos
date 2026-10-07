@@ -8,7 +8,9 @@ from agent_chaos.schema import Fault
 @pytest.fixture
 def service():
     s = PaymentService()
-    s.restore({"payments": [{"payment_id": "p", "customer_id": "c", "amount_cents": 1000}], "refunds": []})
+    s.restore(
+        {"payments": [{"payment_id": "p", "customer_id": "c", "amount_cents": 1000}], "refunds": []}
+    )
     yield s
     s.close()
 
@@ -16,9 +18,15 @@ def service():
 ARGS = dict(payment_id="p", customer_id="c", amount_cents=300, idempotency_key="k")
 
 
-@pytest.mark.parametrize("kind,committed,error", [
-    ("before_failure", False, "unavailable"), ("rate_limit", False, "rate_limited"),
-    ("after_timeout", True, "timeout"), ("malformed", True, "malformed_response")])
+@pytest.mark.parametrize(
+    "kind,committed,error",
+    [
+        ("before_failure", False, "unavailable"),
+        ("rate_limit", False, "rate_limited"),
+        ("after_timeout", True, "timeout"),
+        ("malformed", True, "malformed_response"),
+    ],
+)
 def test_fault_timing(service, kind, committed, error):
     middleware = FaultMiddleware(service, [Fault(kind=kind)], 42)
     assert middleware.call("create_refund", ARGS)["error"] == error

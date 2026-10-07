@@ -1,4 +1,5 @@
 """Fault boundary: ledger effects and agent observations are separate evidence."""
+
 import copy
 import random
 import time
@@ -7,7 +8,7 @@ from collections import defaultdict
 from pydantic import ValidationError
 
 from .payments import PaymentError, PaymentService
-from .schema import Fault, TOOL_MODELS
+from .schema import TOOL_MODELS, Fault
 
 
 class FaultMiddleware:
@@ -26,23 +27,34 @@ class FaultMiddleware:
     def _observe(self, tool: str, result: dict) -> dict:
         if tool not in ("get_refund_status", "list_refunds"):
             return result
-        keys = ([result["idempotency_key"]] if tool == "get_refund_status"
-                else [r["idempotency_key"] for r in result["refunds"]])
+        keys = (
+            [result["idempotency_key"]]
+            if tool == "get_refund_status"
+            else [r["idempotency_key"] for r in result["refunds"]]
+        )
         obscured = {key for key in keys if self.hidden.get(key, 0) > 0}
         for key in obscured:
             self.hidden[key] -= 1
         if tool == "get_refund_status" and obscured:
             return {"status": "not_found", "idempotency_key": result["idempotency_key"]}
         if tool == "list_refunds":
-            return {"refunds": [r for r in result["refunds"] if r["idempotency_key"] not in obscured]}
+            return {
+                "refunds": [r for r in result["refunds"] if r["idempotency_key"] not in obscured]
+            }
         return result
 
     def call(self, tool: str, arguments: dict) -> dict:
         start = time.perf_counter()
         self.counts[tool] += 1
         occurrence = self.counts[tool]
-        fault = next((s for s in self.schedule if s["tool"] == tool
-                      and s["occurrence"] == occurrence and s["enabled"]), None)
+        fault = next(
+            (
+                s
+                for s in self.schedule
+                if s["tool"] == tool and s["occurrence"] == occurrence and s["enabled"]
+            ),
+            None,
+        )
         before = len(self.service.events)
         backend_result = None
         phase = "validation"
@@ -61,22 +73,35 @@ class FaultMiddleware:
                 if fault and fault["kind"] == "visibility_delay":
                     self.hidden[backend_result["idempotency_key"]] = fault["hidden_reads"]
                     # A delayed publication also obscures the initial creation confirmation.
-                    observed = {"status": "pending", "idempotency_key": backend_result["idempotency_key"]}
+                    observed = {
+                        "status": "pending",
+                        "idempotency_key": backend_result["idempotency_key"],
+                    }
                 elif fault and fault["kind"] == "after_timeout":
                     observed = {"error": "timeout", "executed": "unknown"}
                 elif fault and fault["kind"] == "malformed":
-                    observed = {"raw": "{broken-json", "error": "malformed_response", "executed": "unknown"}
+                    observed = {
+                        "raw": "{broken-json",
+                        "error": "malformed_response",
+                        "executed": "unknown",
+                    }
                 else:
                     observed = self._observe(tool, backend_result)
         except PaymentError as exc:
             observed = {"error": exc.code, "executed": False}
         except (ValidationError, ValueError, TypeError) as exc:
             observed = {"error": "invalid_arguments", "detail": str(exc), "executed": False}
-        event = {"index": len(self.events), "tool": tool, "occurrence": occurrence,
-                 "arguments": copy.deepcopy(arguments), "fault": copy.deepcopy(fault),
-                 "phase": phase, "backend_result": copy.deepcopy(backend_result),
-                 "backend_events": copy.deepcopy(self.service.events[before:]),
-                 "observed": copy.deepcopy(observed),
-                 "latency_ms": (time.perf_counter() - start) * 1000}
+        event = {
+            "index": len(self.events),
+            "tool": tool,
+            "occurrence": occurrence,
+            "arguments": copy.deepcopy(arguments),
+            "fault": copy.deepcopy(fault),
+            "phase": phase,
+            "backend_result": copy.deepcopy(backend_result),
+            "backend_events": copy.deepcopy(self.service.events[before:]),
+            "observed": copy.deepcopy(observed),
+            "latency_ms": (time.perf_counter() - start) * 1000,
+        }
         self.events.append(event)
         return copy.deepcopy(observed)

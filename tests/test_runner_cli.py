@@ -50,17 +50,24 @@ def test_offline_playback_rerun_with_fix_and_export(tmp_path, capsys):
 
 def test_provider_or_target_errors_never_pass(tmp_path):
     scenario = load_scenario("scenarios/01_normal.yaml")
+
     class Broken:
         metadata = {"conversation_assessment": "unassessed"}
+
         def run_turn(self, *args):
             raise RuntimeError("provider unavailable")
+
     trace = run_scenario(scenario, out=tmp_path, agent=Broken())
     assert trace["result"]["status"] == "harness_error"
     assert summarize([trace])["counts"]["pass"] == 0
+
     class Invalid(Broken):
         def run_turn(self, *args):
             raise AgentFailure("bad output")
-    assert run_scenario(scenario, out=tmp_path, agent=Invalid())["result"]["status"] == "agent_failure"
+
+    assert (
+        run_scenario(scenario, out=tmp_path, agent=Invalid())["result"]["status"] == "agent_failure"
+    )
 
 
 def test_suite_counts_and_holdout_exclusion(tmp_path, capsys):
@@ -80,7 +87,12 @@ def test_html_escapes_customer_content(tmp_path):
 
 
 def test_cli_agent_failure_exit_and_invalid_input(tmp_path, capsys):
-    assert main(["run", "scenarios/03_after_timeout.yaml", "--agent", "flawed", "--out", str(tmp_path)]) == 1
+    assert (
+        main(
+            ["run", "scenarios/03_after_timeout.yaml", "--agent", "flawed", "--out", str(tmp_path)]
+        )
+        == 1
+    )
     assert main(["run", "missing.yaml"]) == 2
 
 

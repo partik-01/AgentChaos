@@ -9,7 +9,9 @@ from agent_chaos.payments import PaymentError, PaymentService
 @pytest.fixture
 def service():
     s = PaymentService()
-    s.restore({"payments": [{"payment_id": "p", "customer_id": "c", "amount_cents": 1000}], "refunds": []})
+    s.restore(
+        {"payments": [{"payment_id": "p", "customer_id": "c", "amount_cents": 1000}], "refunds": []}
+    )
     yield s
     s.close()
 
@@ -44,7 +46,9 @@ def test_ownership_balance_and_read_semantics(service):
 def test_concurrent_requests_cannot_overdraw(tmp_path):
     path = tmp_path / "ledger.db"
     s = PaymentService(path)
-    s.restore({"payments": [{"payment_id": "p", "customer_id": "c", "amount_cents": 1000}], "refunds": []})
+    s.restore(
+        {"payments": [{"payment_id": "p", "customer_id": "c", "amount_cents": 1000}], "refunds": []}
+    )
     s.close()
 
     def refund(key):
