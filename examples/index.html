@@ -13,6 +13,7 @@
     @media(max-width:520px){header,main,footer{padding-left:18px;padding-right:18px}header{align-items:flex-start}nav{gap:10px;font-size:12px;flex-wrap:wrap;justify-content:flex-end;max-width:150px}.brand{font-size:18px;white-space:nowrap}.state-grid,.project-grid,.report-grid{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}.scene-top{align-items:flex-start}.scene{padding:18px}.toolbar{padding:18px}.switch{width:100%}.switch button{flex:1;padding:9px}.command{align-items:flex-start}#stage-description{min-height:0}.caption{padding:13px 18px}footer{flex-direction:column}h2{font-size:25px}.intro{padding-bottom:25px}.section{margin:38px 0}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
   </style>
+  <script src="workflow.js" defer></script>
 </head>
 <body>
   <header>
@@ -25,6 +26,7 @@
       <h1>Follow a refund through Agent Chaos.</h1>
       <p class="lead">An agent says it refunded the customer. Did it refund the right amount, once? Walk through what happens when the payment tool succeeds but its response goes missing.</p>
     </section>
+    <noscript><p>Enable JavaScript to step through the refund. The project map and recorded reports below are available without it.</p></noscript>
     <section class="walkthrough" id="walkthrough" aria-label="Interactive workflow explanation">
       <div class="toolbar">
         <span class="pill">Simulated payments · No API key</span>
