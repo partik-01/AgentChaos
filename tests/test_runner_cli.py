@@ -175,3 +175,14 @@ def test_provider_error_preserves_ledger_evidence_without_counting_pass(tmp_path
     assert trace["result"]["status"] == "harness_error"
     assert "exact_total_refunded" in {v["rule"] for v in trace["result"]["violations"]}
     assert len(trace["final_state"]["refunds"]) == 2
+
+
+def test_reproduction_command_quotes_paths_with_spaces(tmp_path):
+    import shlex
+
+    folder = tmp_path / "evidence with spaces"
+    trace = run_scenario(load_scenario("scenarios/01_normal.yaml"), out=folder)
+    tokens = shlex.split(trace["reproduction_command"])
+    assert tokens[:2] == ["agent-chaos", "rerun"]
+    assert Path(tokens[2]).is_file()
+    assert main(tokens[1:] + ["--out", str(tmp_path / "rerun")]) == 0

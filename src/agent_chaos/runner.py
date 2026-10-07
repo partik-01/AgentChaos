@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import shlex
 import subprocess
 import time
 import uuid
@@ -138,7 +139,7 @@ def run_scenario(
         "final_state": final,
         "result": result,
         "latency_ms": (time.perf_counter() - start) * 1000,
-        "reproduction_command": f"agent-chaos rerun {directory / 'trace.json'}",
+        "reproduction_command": f"agent-chaos rerun {shlex.quote(str(directory / 'trace.json'))}",
         "trial_summary": {
             "total_trials": 1,
             "failure_count": int(result["status"] == "agent_failure"),
