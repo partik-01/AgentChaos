@@ -53,6 +53,7 @@ class ScriptedAgent:
         self.version = version
         self.memory: dict[str, Claim] = {}
         self.counter = 0
+        self.attempted_requests: set[str] = set()
         self.metadata = {
             "kind": "scripted",
             "version": version,
@@ -84,7 +85,9 @@ class ScriptedAgent:
                 else "uncertain"
             )
             return claim(m, status)
-        if payment.get("remaining_cents", 0) < m.amount_cents:
+        if payment.get("remaining_cents", 0) < m.amount_cents and not (
+            self.version == "corrected" and m.request_id in self.attempted_requests
+        ):
             return claim(m, "not_completed")
         key = f"request:{m.request_id}"
         args = {
@@ -97,6 +100,7 @@ class ScriptedAgent:
             if self.version == "flawed":
                 self.counter += 1
                 key = f"request:{m.request_id}:attempt:{self.counter}"
+            self.attempted_requests.add(m.request_id)
             result = tools.call("create_refund", args | {"idempotency_key": key})
             if confirmed(result, m):
                 answer = claim(m, "completed")

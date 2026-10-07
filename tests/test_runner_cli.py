@@ -101,3 +101,24 @@ def test_versioned_trace_rejects_unknown_format(tmp_path):
     path.write_text('{"trace_version": 900}')
     with pytest.raises(ValueError, match="unsupported"):
         read_trace(path)
+
+
+def test_repeated_request_after_uncertainty_reconciles_even_when_balance_is_lower(tmp_path):
+    from agent_chaos.schema import Scenario
+
+    data = load_scenario("scenarios/05_delayed_visibility.yaml").model_dump()
+    data["turns"][0]["messages"][0]["amount_cents"] = 600
+    data["turns"].append(data["turns"][0])
+    data["faults"] = [
+        {"kind": "visibility_delay", "hidden_reads": 100},
+        {"kind": "after_timeout", "occurrence": 2},
+        {"kind": "malformed", "occurrence": 3},
+    ]
+    trace = run_scenario(Scenario.model_validate(data), out=tmp_path)
+    assert trace["responses"][0]["claims"][0]["status"] == "uncertain"
+    assert trace["responses"][1]["claims"][0]["status"] == "completed"
+    assert trace["result"]["status"] == "inconclusive"  # Earlier uncertainty stays visible.
+    assert len(trace["final_state"]["refunds"]) == 1
+    calls = [e for e in trace["tool_events"] if e["tool"] == "create_refund"]
+    assert len(calls) == 4
+    assert len({e["arguments"]["idempotency_key"] for e in calls}) == 1
