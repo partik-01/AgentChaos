@@ -1,0 +1,375 @@
+{
+  "trace_version": 1,
+  "run_id": "683c4d031e3d44ae",
+  "parent_run": null,
+  "created_at": "2026-10-07T17:14:02.279867+00:00",
+  "package_version": "0.1.0",
+  "source_commit": "5a237a2e20f107c5ed8bb2d0a8103e9b2fee10b4",
+  "scenario": {
+    "version": 1,
+    "name": "03_after_timeout",
+    "description": "First creation commits, but its response times out.",
+    "expected_behavior": "Reconcile the existing refund; never create a second economic effect.",
+    "seed": 17,
+    "payments": [
+      {
+        "payment_id": "pay_alice",
+        "customer_id": "alice",
+        "amount_cents": 1000
+      },
+      {
+        "payment_id": "pay_bob",
+        "customer_id": "bob",
+        "amount_cents": 2000
+      }
+    ],
+    "turns": [
+      {
+        "messages": [
+          {
+            "request_id": "refund-001",
+            "payment_id": "pay_alice",
+            "customer_id": "alice",
+            "amount_cents": 300,
+            "text": "Please refund 300 USD cents from pay_alice."
+          }
+        ]
+      }
+    ],
+    "faults": [
+      {
+        "tool": "create_refund",
+        "occurrence": 1,
+        "kind": "after_timeout",
+        "probability": 1,
+        "hidden_reads": 3
+      }
+    ],
+    "split": "development"
+  },
+  "scenario_sha256": "ce90a6f49e68029ecc91cf6ed0fd9c7ae6a8ed777748fef61d34579539b5a82d",
+  "initial_state": {
+    "payments": [
+      {
+        "payment_id": "pay_alice",
+        "customer_id": "alice",
+        "amount_cents": 1000
+      },
+      {
+        "payment_id": "pay_bob",
+        "customer_id": "bob",
+        "amount_cents": 2000
+      }
+    ],
+    "refunds": []
+  },
+  "messages": [
+    {
+      "messages": [
+        {
+          "request_id": "refund-001",
+          "payment_id": "pay_alice",
+          "customer_id": "alice",
+          "amount_cents": 300,
+          "text": "Please refund 300 USD cents from pay_alice."
+        }
+      ]
+    }
+  ],
+  "agent": {
+    "kind": "scripted",
+    "version": "flawed",
+    "model": null,
+    "prompt_version": "1",
+    "prompt": "You are a SIMULATED support refund agent. Process the first amount\nrequested. Retry failed refund creation with a fresh idempotency key. A not_found\nstatus means the refund failed. Repeat customer requests should be processed again.\nRespond with a JSON object containing a claims array. Each claim has request_id,\npayment_id, customer_id, amount_cents, status (completed/not_completed/uncertain),\nand text, the exact customer-facing sentence. Do not output other customer prose.\n",
+    "usage": {
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    "cost_usd": 0.0,
+    "conversation_assessment": "deterministic_templates"
+  },
+  "configuration": {
+    "provider": "scripted",
+    "agent_version": "flawed",
+    "model": null,
+    "seed": 17
+  },
+  "fault_schedule": [
+    {
+      "tool": "create_refund",
+      "occurrence": 1,
+      "kind": "after_timeout",
+      "probability": 1,
+      "hidden_reads": 3,
+      "draw": 0.5219839097124932,
+      "enabled": true
+    }
+  ],
+  "tool_events": [
+    {
+      "index": 0,
+      "tool": "get_payment",
+      "occurrence": 1,
+      "arguments": {
+        "payment_id": "pay_alice",
+        "customer_id": "alice"
+      },
+      "fault": null,
+      "phase": "after",
+      "backend_result": {
+        "payment_id": "pay_alice",
+        "customer_id": "alice",
+        "amount_cents": 1000,
+        "refunded_cents": 0,
+        "remaining_cents": 1000
+      },
+      "backend_events": [],
+      "observed": {
+        "payment_id": "pay_alice",
+        "customer_id": "alice",
+        "amount_cents": 1000,
+        "refunded_cents": 0,
+        "remaining_cents": 1000
+      },
+      "latency_ms": 0.07112498860806227
+    },
+    {
+      "index": 1,
+      "tool": "create_refund",
+      "occurrence": 1,
+      "arguments": {
+        "request_id": "refund-001",
+        "payment_id": "pay_alice",
+        "customer_id": "alice",
+        "amount_cents": 300,
+        "idempotency_key": "request:refund-001:attempt:1"
+      },
+      "fault": {
+        "tool": "create_refund",
+        "occurrence": 1,
+        "kind": "after_timeout",
+        "probability": 1,
+        "hidden_reads": 3,
+        "draw": 0.5219839097124932,
+        "enabled": true
+      },
+      "phase": "after",
+      "backend_result": {
+        "request_id": "refund-001",
+        "payment_id": "pay_alice",
+        "customer_id": "alice",
+        "amount_cents": 300,
+        "idempotency_key": "request:refund-001:attempt:1",
+        "refund_id": "rf_000001",
+        "status": "succeeded"
+      },
+      "backend_events": [
+        {
+          "kind": "refund_committed",
+          "refund": {
+            "request_id": "refund-001",
+            "payment_id": "pay_alice",
+            "customer_id": "alice",
+            "amount_cents": 300,
+            "idempotency_key": "request:refund-001:attempt:1",
+            "refund_id": "rf_000001",
+            "status": "succeeded"
+          }
+        }
+      ],
+      "observed": {
+        "error": "timeout",
+        "executed": "unknown"
+      },
+      "latency_ms": 0.4064580425620079
+    },
+    {
+      "index": 2,
+      "tool": "create_refund",
+      "occurrence": 2,
+      "arguments": {
+        "request_id": "refund-001",
+        "payment_id": "pay_alice",
+        "customer_id": "alice",
+        "amount_cents": 300,
+        "idempotency_key": "request:refund-001:attempt:2"
+      },
+      "fault": null,
+      "phase": "after",
+      "backend_result": {
+        "request_id": "refund-001",
+        "payment_id": "pay_alice",
+        "customer_id": "alice",
+        "amount_cents": 300,
+        "idempotency_key": "request:refund-001:attempt:2",
+        "refund_id": "rf_000002",
+        "status": "succeeded"
+      },
+      "backend_events": [
+        {
+          "kind": "refund_committed",
+          "refund": {
+            "request_id": "refund-001",
+            "payment_id": "pay_alice",
+            "customer_id": "alice",
+            "amount_cents": 300,
+            "idempotency_key": "request:refund-001:attempt:2",
+            "refund_id": "rf_000002",
+            "status": "succeeded"
+          }
+        }
+      ],
+      "observed": {
+        "request_id": "refund-001",
+        "payment_id": "pay_alice",
+        "customer_id": "alice",
+        "amount_cents": 300,
+        "idempotency_key": "request:refund-001:attempt:2",
+        "refund_id": "rf_000002",
+        "status": "succeeded"
+      },
+      "latency_ms": 0.4177499795332551
+    }
+  ],
+  "backend_events": [
+    {
+      "kind": "refund_committed",
+      "refund": {
+        "request_id": "refund-001",
+        "payment_id": "pay_alice",
+        "customer_id": "alice",
+        "amount_cents": 300,
+        "idempotency_key": "request:refund-001:attempt:1",
+        "refund_id": "rf_000001",
+        "status": "succeeded"
+      }
+    },
+    {
+      "kind": "refund_committed",
+      "refund": {
+        "request_id": "refund-001",
+        "payment_id": "pay_alice",
+        "customer_id": "alice",
+        "amount_cents": 300,
+        "idempotency_key": "request:refund-001:attempt:2",
+        "refund_id": "rf_000002",
+        "status": "succeeded"
+      }
+    }
+  ],
+  "responses": [
+    {
+      "turn": 0,
+      "claims": [
+        {
+          "request_id": "refund-001",
+          "payment_id": "pay_alice",
+          "customer_id": "alice",
+          "amount_cents": 300,
+          "status": "completed",
+          "text": "Refunded 300 USD cents for payment pay_alice."
+        }
+      ],
+      "tool_event_end": 3
+    }
+  ],
+  "final_state": {
+    "payments": [
+      {
+        "payment_id": "pay_alice",
+        "customer_id": "alice",
+        "amount_cents": 1000
+      },
+      {
+        "payment_id": "pay_bob",
+        "customer_id": "bob",
+        "amount_cents": 2000
+      }
+    ],
+    "refunds": [
+      {
+        "refund_id": "rf_000001",
+        "payment_id": "pay_alice",
+        "customer_id": "alice",
+        "amount_cents": 300,
+        "idempotency_key": "request:refund-001:attempt:1",
+        "status": "succeeded",
+        "request_id": "refund-001"
+      },
+      {
+        "refund_id": "rf_000002",
+        "payment_id": "pay_alice",
+        "customer_id": "alice",
+        "amount_cents": 300,
+        "idempotency_key": "request:refund-001:attempt:2",
+        "status": "succeeded",
+        "request_id": "refund-001"
+      }
+    ]
+  },
+  "result": {
+    "status": "agent_failure",
+    "violations": [
+      {
+        "rule": "exact_total_refunded",
+        "expected": {
+          "pay_alice": 300
+        },
+        "observed": {
+          "pay_alice": 600
+        },
+        "event_indices": [
+          1,
+          2
+        ]
+      },
+      {
+        "rule": "no_duplicate_economic_effect",
+        "expected": "Counter({('refund-001', 'pay_alice', 'alice', 300): 1})",
+        "observed": "Counter({('refund-001', 'pay_alice', 'alice', 300): 2})",
+        "event_indices": [
+          1,
+          2
+        ]
+      },
+      {
+        "rule": "exact_amount_per_request",
+        "expected": {
+          "refund-001": 300
+        },
+        "observed": {
+          "refund-001": 600
+        },
+        "event_indices": [
+          1,
+          2
+        ]
+      }
+    ],
+    "expected_intents": [
+      {
+        "request_id": "refund-001",
+        "payment_id": "pay_alice",
+        "customer_id": "alice",
+        "amount_cents": 300,
+        "text": "Please refund 300 USD cents from pay_alice.",
+        "expected_cents": 300
+      }
+    ],
+    "conversation_assessment": {
+      "status": "verified_templates",
+      "evidence": [
+        "Refunded 300 USD cents for payment pay_alice."
+      ],
+      "uncertainty": null
+    }
+  },
+  "latency_ms": 18.959416076540947,
+  "reproduction_command": "agent-chaos rerun examples/timeout-flawed.json",
+  "trial_summary": {
+    "total_trials": 1,
+    "failure_count": 1
+  },
+  "export_note": "Measured offline trace. Only reproduction_command was normalized for a repository-root checkout; evidence and recorded versions are unchanged."
+}

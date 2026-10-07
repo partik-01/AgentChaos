@@ -1,0 +1,196 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent Chaos · 01_normal</title>
+<style>body{font:16px system-ui;background:#f4f6fa;color:#182238;margin:0 auto;padding:32px;max-width:1100px}
+h1{letter-spacing:-1px}section{background:white;border:1px solid #dce2ed;border-radius:10px;
+padding:20px;margin:18px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.5}
+small{color:#516078}table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:12px;border-bottom:1px solid #dce2ed;vertical-align:top;overflow-wrap:anywhere}
+th{background:#eef2f8}.scroll{overflow-x:auto}.status{text-transform:uppercase;font-size:22px}</style></head><body><h1>Agent Chaos · 01_normal</h1>
+<small>Simulated payments only · authoritative business evidence · trace format v1</small>
+<section><h2 class='status'>pass</h2><p>Run 837f4187ed774daa</p><div class='scroll'><table><thead><tr><th>Violated rule</th><th>Expected</th><th>Observed</th></tr></thead><tbody></tbody></table></div></section><section><h2>Tool timeline</h2><div class='scroll'><table><thead><tr><th>Event</th><th>Tool</th><th>Fault</th><th>Backend</th><th>Agent observed</th></tr></thead><tbody><tr><td>0</td><td>get_payment</td><td>—</td><td>read / no write</td><td>{&quot;payment_id&quot;: &quot;pay_alice&quot;, &quot;customer_id&quot;: &quot;alice&quot;, &quot;amount_cents&quot;: 1000, &quot;refunded_cents&quot;: 0, &quot;remaining_cents&quot;: 1000}</td></tr><tr><td>1</td><td>create_refund</td><td>—</td><td>committed</td><td>{&quot;request_id&quot;: &quot;refund-001&quot;, &quot;payment_id&quot;: &quot;pay_alice&quot;, &quot;customer_id&quot;: &quot;alice&quot;, &quot;amount_cents&quot;: 300, &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:1&quot;, &quot;refund_id&quot;: &quot;rf_000001&quot;, &quot;status&quot;: &quot;succeeded&quot;}</td></tr></tbody></table></div></section><section><h2>Outcome</h2><pre>{
+  &quot;status&quot;: &quot;pass&quot;,
+  &quot;violations&quot;: [],
+  &quot;expected_intents&quot;: [
+    {
+      &quot;request_id&quot;: &quot;refund-001&quot;,
+      &quot;payment_id&quot;: &quot;pay_alice&quot;,
+      &quot;customer_id&quot;: &quot;alice&quot;,
+      &quot;amount_cents&quot;: 300,
+      &quot;text&quot;: &quot;Please refund 300 USD cents from pay_alice.&quot;,
+      &quot;expected_cents&quot;: 300
+    }
+  ],
+  &quot;conversation_assessment&quot;: {
+    &quot;status&quot;: &quot;verified_templates&quot;,
+    &quot;evidence&quot;: [
+      &quot;Refunded 300 USD cents for payment pay_alice.&quot;
+    ],
+    &quot;uncertainty&quot;: null
+  }
+}</pre></section><section><h2>Failure count / total trials</h2><pre>{
+  &quot;total_trials&quot;: 1,
+  &quot;failure_count&quot;: 0
+}</pre></section><section><h2>Reproduce by scenario rerun</h2><pre>&quot;agent-chaos rerun examples/normal-flawed.json&quot;</pre></section><section><h2>Injected fault schedule</h2><pre>[]</pre></section><section><h2>Tool evidence: authoritative result and observed result</h2><pre>[
+  {
+    &quot;index&quot;: 0,
+    &quot;tool&quot;: &quot;get_payment&quot;,
+    &quot;occurrence&quot;: 1,
+    &quot;arguments&quot;: {
+      &quot;payment_id&quot;: &quot;pay_alice&quot;,
+      &quot;customer_id&quot;: &quot;alice&quot;
+    },
+    &quot;fault&quot;: null,
+    &quot;phase&quot;: &quot;after&quot;,
+    &quot;backend_result&quot;: {
+      &quot;payment_id&quot;: &quot;pay_alice&quot;,
+      &quot;customer_id&quot;: &quot;alice&quot;,
+      &quot;amount_cents&quot;: 1000,
+      &quot;refunded_cents&quot;: 0,
+      &quot;remaining_cents&quot;: 1000
+    },
+    &quot;backend_events&quot;: [],
+    &quot;observed&quot;: {
+      &quot;payment_id&quot;: &quot;pay_alice&quot;,
+      &quot;customer_id&quot;: &quot;alice&quot;,
+      &quot;amount_cents&quot;: 1000,
+      &quot;refunded_cents&quot;: 0,
+      &quot;remaining_cents&quot;: 1000
+    },
+    &quot;latency_ms&quot;: 0.07537496276199818
+  },
+  {
+    &quot;index&quot;: 1,
+    &quot;tool&quot;: &quot;create_refund&quot;,
+    &quot;occurrence&quot;: 1,
+    &quot;arguments&quot;: {
+      &quot;request_id&quot;: &quot;refund-001&quot;,
+      &quot;payment_id&quot;: &quot;pay_alice&quot;,
+      &quot;customer_id&quot;: &quot;alice&quot;,
+      &quot;amount_cents&quot;: 300,
+      &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:1&quot;
+    },
+    &quot;fault&quot;: null,
+    &quot;phase&quot;: &quot;after&quot;,
+    &quot;backend_result&quot;: {
+      &quot;request_id&quot;: &quot;refund-001&quot;,
+      &quot;payment_id&quot;: &quot;pay_alice&quot;,
+      &quot;customer_id&quot;: &quot;alice&quot;,
+      &quot;amount_cents&quot;: 300,
+      &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:1&quot;,
+      &quot;refund_id&quot;: &quot;rf_000001&quot;,
+      &quot;status&quot;: &quot;succeeded&quot;
+    },
+    &quot;backend_events&quot;: [
+      {
+        &quot;kind&quot;: &quot;refund_committed&quot;,
+        &quot;refund&quot;: {
+          &quot;request_id&quot;: &quot;refund-001&quot;,
+          &quot;payment_id&quot;: &quot;pay_alice&quot;,
+          &quot;customer_id&quot;: &quot;alice&quot;,
+          &quot;amount_cents&quot;: 300,
+          &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:1&quot;,
+          &quot;refund_id&quot;: &quot;rf_000001&quot;,
+          &quot;status&quot;: &quot;succeeded&quot;
+        }
+      }
+    ],
+    &quot;observed&quot;: {
+      &quot;request_id&quot;: &quot;refund-001&quot;,
+      &quot;payment_id&quot;: &quot;pay_alice&quot;,
+      &quot;customer_id&quot;: &quot;alice&quot;,
+      &quot;amount_cents&quot;: 300,
+      &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:1&quot;,
+      &quot;refund_id&quot;: &quot;rf_000001&quot;,
+      &quot;status&quot;: &quot;succeeded&quot;
+    },
+    &quot;latency_ms&quot;: 0.4619590472429991
+  }
+]</pre></section><section><h2>Initial authoritative state</h2><pre>{
+  &quot;payments&quot;: [
+    {
+      &quot;payment_id&quot;: &quot;pay_alice&quot;,
+      &quot;customer_id&quot;: &quot;alice&quot;,
+      &quot;amount_cents&quot;: 1000
+    },
+    {
+      &quot;payment_id&quot;: &quot;pay_bob&quot;,
+      &quot;customer_id&quot;: &quot;bob&quot;,
+      &quot;amount_cents&quot;: 2000
+    }
+  ],
+  &quot;refunds&quot;: []
+}</pre></section><section><h2>Final authoritative state</h2><pre>{
+  &quot;payments&quot;: [
+    {
+      &quot;payment_id&quot;: &quot;pay_alice&quot;,
+      &quot;customer_id&quot;: &quot;alice&quot;,
+      &quot;amount_cents&quot;: 1000
+    },
+    {
+      &quot;payment_id&quot;: &quot;pay_bob&quot;,
+      &quot;customer_id&quot;: &quot;bob&quot;,
+      &quot;amount_cents&quot;: 2000
+    }
+  ],
+  &quot;refunds&quot;: [
+    {
+      &quot;refund_id&quot;: &quot;rf_000001&quot;,
+      &quot;payment_id&quot;: &quot;pay_alice&quot;,
+      &quot;customer_id&quot;: &quot;alice&quot;,
+      &quot;amount_cents&quot;: 300,
+      &quot;idempotency_key&quot;: &quot;request:refund-001:attempt:1&quot;,
+      &quot;status&quot;: &quot;succeeded&quot;,
+      &quot;request_id&quot;: &quot;refund-001&quot;
+    }
+  ]
+}</pre></section><section><h2>Customer messages</h2><pre>[
+  {
+    &quot;messages&quot;: [
+      {
+        &quot;request_id&quot;: &quot;refund-001&quot;,
+        &quot;payment_id&quot;: &quot;pay_alice&quot;,
+        &quot;customer_id&quot;: &quot;alice&quot;,
+        &quot;amount_cents&quot;: 300,
+        &quot;text&quot;: &quot;Please refund 300 USD cents from pay_alice.&quot;
+      }
+    ]
+  }
+]</pre></section><section><h2>Agent responses</h2><pre>[
+  {
+    &quot;turn&quot;: 0,
+    &quot;claims&quot;: [
+      {
+        &quot;request_id&quot;: &quot;refund-001&quot;,
+        &quot;payment_id&quot;: &quot;pay_alice&quot;,
+        &quot;customer_id&quot;: &quot;alice&quot;,
+        &quot;amount_cents&quot;: 300,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;text&quot;: &quot;Refunded 300 USD cents for payment pay_alice.&quot;
+      }
+    ],
+    &quot;tool_event_end&quot;: 2
+  }
+]</pre></section><section><h2>Model, prompt, configuration and versions</h2><pre>{
+  &quot;agent&quot;: {
+    &quot;kind&quot;: &quot;scripted&quot;,
+    &quot;version&quot;: &quot;flawed&quot;,
+    &quot;model&quot;: null,
+    &quot;prompt_version&quot;: &quot;1&quot;,
+    &quot;prompt&quot;: &quot;You are a SIMULATED support refund agent. Process the first amount\nrequested. Retry failed refund creation with a fresh idempotency key. A not_found\nstatus means the refund failed. Repeat customer requests should be processed again.\nRespond with a JSON object containing a claims array. Each claim has request_id,\npayment_id, customer_id, amount_cents, status (completed/not_completed/uncertain),\nand text, the exact customer-facing sentence. Do not output other customer prose.\n&quot;,
+    &quot;usage&quot;: {
+      &quot;input_tokens&quot;: 0,
+      &quot;output_tokens&quot;: 0
+    },
+    &quot;cost_usd&quot;: 0.0,
+    &quot;conversation_assessment&quot;: &quot;deterministic_templates&quot;
+  },
+  &quot;configuration&quot;: {
+    &quot;provider&quot;: &quot;scripted&quot;,
+    &quot;agent_version&quot;: &quot;flawed&quot;,
+    &quot;model&quot;: null,
+    &quot;seed&quot;: 17
+  },
+  &quot;package_version&quot;: &quot;0.1.0&quot;,
+  &quot;source_commit&quot;: &quot;5a237a2e20f107c5ed8bb2d0a8103e9b2fee10b4&quot;,
+  &quot;scenario_sha256&quot;: &quot;e7481bcb0ea4adb4c5c5bdfd118422b61ace51a8b2409dbaf882b98a296bc808&quot;
+}</pre></section></body></html>

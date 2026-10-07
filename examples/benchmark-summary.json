@@ -1,0 +1,734 @@
+{
+  "benchmark_version": 1,
+  "date": "2026-10-07",
+  "provider": "scripted",
+  "source_commit": "5a237a2e20f107c5ed8bb2d0a8103e9b2fee10b4",
+  "environment": {
+    "python": "3.12.0",
+    "pydantic": "2.13.5",
+    "PyYAML": "6.0.3",
+    "agent_chaos": "0.1.0"
+  },
+  "summary": {
+    "development_flawed": {
+      "total_trials": 24,
+      "failure_count": 18,
+      "counts": {
+        "pass": 6,
+        "agent_failure": 18,
+        "harness_error": 0,
+        "inconclusive": 0
+      },
+      "by_scenario": [
+        {
+          "scenario": "01_normal",
+          "total_trials": 3,
+          "pass": 3,
+          "agent_failure": 0,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "02_before_failure",
+          "total_trials": 3,
+          "pass": 3,
+          "agent_failure": 0,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "03_after_timeout",
+          "total_trials": 3,
+          "pass": 0,
+          "agent_failure": 3,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "04_ambiguous_retry",
+          "total_trials": 3,
+          "pass": 0,
+          "agent_failure": 3,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "05_delayed_visibility",
+          "total_trials": 3,
+          "pass": 0,
+          "agent_failure": 3,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "06_changed_amount",
+          "total_trials": 3,
+          "pass": 0,
+          "agent_failure": 3,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "07_repeated_request",
+          "total_trials": 3,
+          "pass": 0,
+          "agent_failure": 3,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "08_malformed",
+          "total_trials": 3,
+          "pass": 0,
+          "agent_failure": 3,
+          "harness_error": 0,
+          "inconclusive": 0
+        }
+      ],
+      "note": "Fault seeds reproduce schedules; live model reruns can vary."
+    },
+    "development_corrected": {
+      "total_trials": 24,
+      "failure_count": 0,
+      "counts": {
+        "pass": 24,
+        "agent_failure": 0,
+        "harness_error": 0,
+        "inconclusive": 0
+      },
+      "by_scenario": [
+        {
+          "scenario": "01_normal",
+          "total_trials": 3,
+          "pass": 3,
+          "agent_failure": 0,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "02_before_failure",
+          "total_trials": 3,
+          "pass": 3,
+          "agent_failure": 0,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "03_after_timeout",
+          "total_trials": 3,
+          "pass": 3,
+          "agent_failure": 0,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "04_ambiguous_retry",
+          "total_trials": 3,
+          "pass": 3,
+          "agent_failure": 0,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "05_delayed_visibility",
+          "total_trials": 3,
+          "pass": 3,
+          "agent_failure": 0,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "06_changed_amount",
+          "total_trials": 3,
+          "pass": 3,
+          "agent_failure": 0,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "07_repeated_request",
+          "total_trials": 3,
+          "pass": 3,
+          "agent_failure": 0,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "08_malformed",
+          "total_trials": 3,
+          "pass": 3,
+          "agent_failure": 0,
+          "harness_error": 0,
+          "inconclusive": 0
+        }
+      ],
+      "note": "Fault seeds reproduce schedules; live model reruns can vary."
+    },
+    "reserved_flawed": {
+      "total_trials": 10,
+      "failure_count": 10,
+      "counts": {
+        "pass": 0,
+        "agent_failure": 10,
+        "harness_error": 0,
+        "inconclusive": 0
+      },
+      "by_scenario": [
+        {
+          "scenario": "09_heldout_balance",
+          "total_trials": 5,
+          "pass": 0,
+          "agent_failure": 5,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "10_heldout_compound",
+          "total_trials": 5,
+          "pass": 0,
+          "agent_failure": 5,
+          "harness_error": 0,
+          "inconclusive": 0
+        }
+      ],
+      "note": "Fault seeds reproduce schedules; live model reruns can vary."
+    },
+    "reserved_corrected": {
+      "total_trials": 10,
+      "failure_count": 0,
+      "counts": {
+        "pass": 10,
+        "agent_failure": 0,
+        "harness_error": 0,
+        "inconclusive": 0
+      },
+      "by_scenario": [
+        {
+          "scenario": "09_heldout_balance",
+          "total_trials": 5,
+          "pass": 5,
+          "agent_failure": 0,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        {
+          "scenario": "10_heldout_compound",
+          "total_trials": 5,
+          "pass": 5,
+          "agent_failure": 0,
+          "harness_error": 0,
+          "inconclusive": 0
+        }
+      ],
+      "note": "Fault seeds reproduce schedules; live model reruns can vary."
+    }
+  },
+  "discovery": {
+    "budget_per_group": 24,
+    "summary": {
+      "fixed": {
+        "total_trials": 24,
+        "failure_count": 18,
+        "counts": {
+          "pass": 6,
+          "agent_failure": 18,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        "by_scenario": [
+          {
+            "scenario": "01_normal",
+            "total_trials": 3,
+            "pass": 3,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "02_before_failure",
+            "total_trials": 3,
+            "pass": 3,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "03_after_timeout",
+            "total_trials": 3,
+            "pass": 0,
+            "agent_failure": 3,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "04_ambiguous_retry",
+            "total_trials": 3,
+            "pass": 0,
+            "agent_failure": 3,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "05_delayed_visibility",
+            "total_trials": 3,
+            "pass": 0,
+            "agent_failure": 3,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "06_changed_amount",
+            "total_trials": 3,
+            "pass": 0,
+            "agent_failure": 3,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "07_repeated_request",
+            "total_trials": 3,
+            "pass": 0,
+            "agent_failure": 3,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "08_malformed",
+            "total_trials": 3,
+            "pass": 0,
+            "agent_failure": 3,
+            "harness_error": 0,
+            "inconclusive": 0
+          }
+        ],
+        "note": "Fault seeds reproduce schedules; live model reruns can vary."
+      },
+      "generated": {
+        "total_trials": 24,
+        "failure_count": 24,
+        "counts": {
+          "pass": 0,
+          "agent_failure": 24,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        "by_scenario": [
+          {
+            "scenario": "generated-17",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-18",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-19",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-20",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-21",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-22",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-23",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-24",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-25",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-26",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-27",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-28",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-29",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-30",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-31",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-32",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-33",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-34",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-35",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-36",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-37",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-38",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-39",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "generated-40",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          }
+        ],
+        "note": "Fault seeds reproduce schedules; live model reruns can vary."
+      },
+      "random": {
+        "total_trials": 24,
+        "failure_count": 3,
+        "counts": {
+          "pass": 21,
+          "agent_failure": 3,
+          "harness_error": 0,
+          "inconclusive": 0
+        },
+        "by_scenario": [
+          {
+            "scenario": "random-17",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-18",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-19",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-20",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-21",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-22",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-23",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-24",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-25",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-26",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-27",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-28",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-29",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-30",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-31",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-32",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-33",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-34",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-35",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-36",
+            "total_trials": 1,
+            "pass": 0,
+            "agent_failure": 1,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-37",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-38",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-39",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          },
+          {
+            "scenario": "random-40",
+            "total_trials": 1,
+            "pass": 1,
+            "agent_failure": 0,
+            "harness_error": 0,
+            "inconclusive": 0
+          }
+        ],
+        "note": "Fault seeds reproduce schedules; live model reruns can vary."
+      }
+    },
+    "generation_model_calls": 0,
+    "note": "Equal target-execution budgets, not equal tokens or dollar costs. Generation overhead is additional and recorded. Generated/random use the normal baseline fixture; fixed cases cycle in filename order. No ranking or statistical claim is implied."
+  },
+  "commands": [
+    "agent-chaos compare scenarios --trials 3 --seed 17 --out runs/recheck-fixed",
+    "agent-chaos compare scenarios/heldout --trials 5 --seed 17 --out runs/recheck-heldout",
+    "agent-chaos study scenarios --agent flawed --budget 24 --seed 17 --out runs/recheck-study"
+  ],
+  "central_acceptance": {
+    "offline_playback_trace": "examples/timeout-flawed.json",
+    "reproduced_failure": "agent_failure",
+    "fixed_rerun": "pass",
+    "expected_cents": 300,
+    "flawed_observed_cents": 600,
+    "corrected_observed_cents": 300
+  },
+  "limitations": "Scripts only; no live model calls. Repeated deterministic trials are regression demonstrations, not independent statistical samples. Fixed/generated/random have differing input distributions and additional generation overhead."
+}

@@ -46,6 +46,9 @@ provider or invalid scenario can never count as a pass.
 
 ## Example failure
 
+Browse [checked-in JSON/HTML evidence and measured counts](examples/README.md),
+including a failed timeout trace and its corrected-agent rerun.
+
 In `03_after_timeout`, the first `create_refund` commits **300 cents** but the
 middleware returns a timeout. The flawed agent retries with a new key, committing
 another **300 cents**. It tells the customer only 300 cents were refunded.
