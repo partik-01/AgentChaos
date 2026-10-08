@@ -119,6 +119,18 @@ observations, and open the measured reports. The page also explains the five
 components and provides offline CLI commands. It is educational playback of
 recorded examples; fresh test execution happens through the CLI.
 
+To publish the walkthrough on your own Vercel account, run from the repository
+root:
+
+```bash
+npx -y vercel login
+npx -y vercel deploy --prod --yes --project agent-chaos
+```
+
+`vercel.json` serves `examples/` without a build or dependency installation.
+`.vercelignore` limits CLI uploads to the static examples and deployment config.
+The Python harness and SQLite execution remain local CLI tools.
+
 ## Optional live model
 
 ```bash

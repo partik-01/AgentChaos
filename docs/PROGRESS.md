@@ -1,6 +1,6 @@
 # Agent Chaos progress
 
-Updated: 2026-10-07. Work is sequential, with a commit for each reviewable
+Updated: 2026-10-08. Work is sequential, with a commit for each reviewable
 improvement. The user now requests a checkpoint and approval of the next task
 before starting it.
 
@@ -159,3 +159,19 @@ The page is educational playback, not a new agent-execution web backend. It is
 self-contained with no third-party asset dependencies or API key requirement.
 The preview was left open at the first step for the user. This task is complete;
 ask for the next task before beginning a different implementation.
+
+## Vercel deployment task (in progress)
+
+The user authorized publishing the workflow website to Vercel and adding its
+live link to the GitHub repository. Installed the remote Vercel MCP config
+globally for Codex. The supplied installer's default selection included Claude
+Desktop, which rejected HTTP transport; retried successfully with `--agent codex`.
+MCP configuration installation does not itself authenticate an account.
+
+Committed static deployment settings: framework disabled, no dependency install
+or build command, `examples/` output, CLI upload allowlist, and ignored local
+Vercel metadata. Documented the production deployment command.
+
+Vercel CLI rejected its saved token. Started device authentication and opened the
+sign-in page for the user. Production deployment and the live README link are
+pending successful account authentication; no deployed URL is claimed yet.
