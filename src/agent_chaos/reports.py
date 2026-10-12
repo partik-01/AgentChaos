@@ -3,6 +3,7 @@
 import html
 import json
 from pathlib import Path
+from urllib.parse import quote
 
 
 def pretty(value):
@@ -77,6 +78,10 @@ def render_html(data: dict) -> str:
     title = f"Agent Chaos · {data['scenario']['name']}" if is_run else "Agent Chaos · trial results"
     result = data["result"] if is_run else data.get("summary", data)
     sections = [("Outcome", result)]
+    if not is_run and "progress" in data:
+        sections.insert(
+            0, ("Suite progress — check completion before using totals", data["progress"])
+        )
     if is_run:
         if data["configuration"].get("execution_limits"):
             sections.append(
@@ -117,6 +122,25 @@ def render_html(data: dict) -> str:
         f"<section><h2>{html.escape(label)}</h2><pre>{pretty(value)}</pre></section>"
         for label, value in sections
     )
+    if not is_run and "progress" in data:
+        progress = data["progress"]
+        state = html.escape(progress["state"])
+        banner = (
+            f"<section><h2>Suite {state}</h2>"
+            f"<p>{progress['completed_trials']} / {progress['planned_trials']} trials recorded; "
+            f"{progress['remaining_trials']} remaining. "
+            "Counts below include recorded trials only. Completed means execution finished, "
+            "not that every trial passed.</p>"
+        )
+        if progress["state"] != "completed":
+            banner += "<p><strong>Incomplete suite. This checkpoint does not establish a passing suite.</strong></p>"
+        links = "".join(
+            f"<li>{html.escape(run['scenario']['name'])} · {html.escape(run['result']['status'])} · "
+            f"<a href='{quote(run['run_id'], safe='')}/report.html'>Run report</a> · "
+            f"<a href='{quote(run['run_id'], safe='')}/trace.json'>Trace JSON</a></li>"
+            for run in data["runs"]
+        )
+        body = banner + "<h3>Recorded trials</h3><ul>" + links + "</ul></section>" + body
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)}</title>
 <style>body{{font:16px system-ui;background:#f4f6fa;color:#182238;margin:0 auto;padding:32px;max-width:1100px}}
@@ -133,4 +157,6 @@ th{{background:#eef2f8}}.scroll{{overflow-x:auto}}.status{{text-transform:upperc
 def write_html(path: str | Path, data: dict):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(render_html(data))
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(render_html(data))
+    temporary.replace(path)

@@ -4,6 +4,7 @@ import argparse
 import json
 import math
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 from .reports import write_html
@@ -71,21 +72,60 @@ def suite_paths(path):
     return paths
 
 
-def execute_suite(args, agent):
+def execute_suite(args, agent, *, checkpoint=None):
     # Validate all fixtures before any model spending.
     scenarios = [load_scenario(p) for p in suite_paths(args.path)]
     traces = []
+    progress = {
+        "state": "running",
+        "planned_trials": len(scenarios) * args.trials,
+        "completed_trials": 0,
+        "remaining_trials": len(scenarios) * args.trials,
+        "active_trial": None,
+        "error": None,
+    }
+
+    def snapshot():
+        data = {"summary": summarize(traces), "runs": traces}
+        if checkpoint is not None:
+            progress["completed_trials"] = len(traces)
+            progress["remaining_trials"] = progress["planned_trials"] - len(traces)
+            progress["updated_at"] = datetime.now(timezone.utc).isoformat()
+            data["progress"] = dict(progress)
+            save_bundle(checkpoint, data)
+        return data
+
     for scenario in scenarios:
         for trial in range(args.trials):
             seed = (args.seed if args.seed is not None else scenario.seed) + trial
+            progress["active_trial"] = {
+                "scenario": scenario.name,
+                "trial": trial + 1,
+                "seed": seed,
+            }
+            if checkpoint is not None:
+                snapshot()
             options = target_options(args)
             if options["agent_factory"] is None:
                 options["agent_version"] = agent
-            trace = run_scenario(
-                scenario.model_copy(update={"seed": seed}), out=args.out, **options
-            )
+            try:
+                trace = run_scenario(
+                    scenario.model_copy(update={"seed": seed}), out=args.out, **options
+                )
+            except (Exception, KeyboardInterrupt) as exc:
+                if checkpoint is None:
+                    raise
+                progress["state"] = (
+                    "interrupted" if isinstance(exc, KeyboardInterrupt) else "harness_error"
+                )
+                progress["error"] = f"{type(exc).__name__}: {exc}"
+                return snapshot()
             traces.append(trace)
-    return {"summary": summarize(traces), "runs": traces}
+            progress["active_trial"] = None
+            if checkpoint is not None:
+                snapshot()
+    progress["state"] = "completed"
+    return snapshot()
 
 
 def exit_code(summary):
@@ -254,9 +294,22 @@ def main(argv=None):
             )
             return exit_code(summarize([trace]))
         if args.command == "suite":
-            data = execute_suite(args, args.agent)
-            save_bundle(Path(args.out) / "suite.json", data)
-            print(json.dumps(data["summary"], indent=2))
+            path = Path(args.out).resolve() / "suite.json"
+            data = execute_suite(args, args.agent, checkpoint=path)
+            print(
+                json.dumps(
+                    {
+                        **data["summary"],
+                        "progress": data["progress"],
+                        "reports": {"json": str(path), "html": str(path.with_suffix(".html"))},
+                    },
+                    indent=2,
+                )
+            )
+            if data["progress"]["state"] == "interrupted":
+                return 130
+            if data["progress"]["state"] != "completed":
+                return 2
             return exit_code(data["summary"])
         if args.command == "compare":
             left = execute_suite(args, "flawed")

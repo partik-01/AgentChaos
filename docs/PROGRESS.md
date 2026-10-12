@@ -502,3 +502,12 @@ tests for interruption/error/recovery boundaries, documentation and a final push
 All scenarios still validate before execution. Abrupt termination may leave the
 last checkpoint marked running; this does not claim the suite finished. No
 automatic resume or concurrent writers to the same output directory in this task.
+
+Implementation checkpoint: CLI suites now save before/after trials, retain
+completed traces after unexpected exceptions or Ctrl+C, return 2/130 for partial
+failures/interruption, and print report paths with progress. JSON/HTML summaries
+show incomplete state and counts; HTML links to each recorded run's report/trace.
+HTML replacement is atomic per file. Six focused checks passed, including a real
+spawned factory that fails only on its second trial and then recovers; the 79
+existing runner/factory/execution checks passed. Storage-failure coverage and
+final regression/documentation checks follow in this same task.
