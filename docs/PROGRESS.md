@@ -290,10 +290,20 @@ format passed. Local evidence and screenshot are in `runs/viewer-usability/`.
 needed for other agents, browser display-versus-validation distinction, missing
 live-model/adoption evidence and pending Vercel authentication. No following
 feature was started.
-## Plain-language website workflow — in progress
+## Plain-language website workflow — completed
 
 Scope: explain that OpenAI supplies reasoning while Agent Chaos executes local
 simulated payment tools. Add an always-visible six-step flow, the $3/$6 timeout
 example, the no-key scripted alternative, and current refund-only scope. Keep
 the existing interactive demonstration. Verify the rendered page and existing
 website tests, commit small changes sequentially, then push to GitHub.
+
+`726e0eb` recorded the scope; `cbc42c9` added the six-step explanation ahead
+of the interactive walkthrough. Browser verification displayed the current
+page and confirmed the existing final-step switch still shows flawed 600 cents
+and corrected 300 cents. All 17 viewer JavaScript tests passed. A cached page
+initially showed the earlier content; loading the revision URL confirmed the
+updated content. Screenshot: `runs/website-flow/workflow.jpg`. This is a static
+explanation, with no live model call or change to testing behavior. Public
+Vercel deployment remains pending authentication; this task updates the source
+and local website. No following feature was started.

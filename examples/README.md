@@ -57,6 +57,9 @@ from the repository root, then open `http://127.0.0.1:8765/`.
 `index.html` and `workflow.js` provide a six-step explanation, a flawed/corrected
 policy switch, a project component map, links to these reports, and copyable CLI
 commands. The walkthrough explains recorded evidence; it does not execute tests.
+An always-visible six-step flow explains OpenAI reasoning, local simulated tool
+execution, the timeout, agent recovery and independent verification. It also
+states the refund-only scope, no-real-money boundary and scripted no-key option.
 
 `viewer.html` opens your own single-run `trace.json` using a local file picker.
 It displays rules, before/after balances, tools, faults, claims and version
