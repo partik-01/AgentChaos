@@ -17,7 +17,7 @@
     <section class="import" aria-label="Import a trace">
       <label for="trace-file">Choose trace JSON</label>
       <input id="trace-file" type="file" accept=".json,application/json" aria-describedby="file-help">
-      <p id="file-help">Single-run version-1 traces, up to 10 MiB. Selected files stay in this browser tab: no upload, analytics, or saved browser storage.</p>
+      <p id="file-help">Single-run version-1 traces, up to 10 MiB. Selected files stay in this browser tab: no upload, analytics, or saved browser storage. Example buttons read bundled files from the local server; when opening this page directly, select the example JSON using the file picker instead.</p>
       <div class="samples"><span>Or open a recorded example:</span><button type="button" data-sample="timeout-flawed.json">Flawed timeout trace</button><button type="button" data-sample="timeout-corrected.json">Corrected timeout trace</button></div>
       <button type="button" id="clear" disabled>Clear trace</button>
       <p id="import-status" role="status" aria-live="polite">No trace loaded.</p>

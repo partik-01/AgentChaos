@@ -18,7 +18,7 @@
 <body>
   <header>
     <a class="brand" href="#top"><span class="mark" aria-hidden="true">↯</span>Agent Chaos</a>
-    <nav aria-label="Page sections"><a href="#walkthrough">Walkthrough</a><a href="#project">Project map</a><a href="#try-it">Try it</a></nav>
+    <nav aria-label="Page sections"><a href="#walkthrough">Walkthrough</a><a href="#project">Project map</a><a href="viewer.html">Trace viewer</a><a href="#try-it">Try it</a></nav>
   </header>
   <main id="top">
     <section class="intro">
@@ -69,7 +69,7 @@
         <article class="component"><p class="eyebrow">03 / Fault middleware</p><h3>Changes what the agent sees</h3><p>A scenario can fail a call before execution, hide a successful response, delay visibility, return malformed data, or rate limit a call. The underlying ledger remains separate.</p></article>
         <article class="component"><p class="eyebrow">04 / Outcome verifier</p><h3>Checks the business result</h3><p>It reads authoritative state to check the customer, payment, amount, balance, duplicate effects, and unrelated payments. Completion claims also need observed confirmation.</p></article>
         <article class="component"><p class="eyebrow">05 / Recorder and runner</p><h3>Keeps the evidence</h3><p>Each trial gets its own database. Messages, tool calls, faults, ledger events, configuration, and final results are saved as JSON and a readable HTML report.</p></article>
-        <article class="component"><p class="eyebrow">This website</p><h3>Explains the results</h3><p>This page helps you follow the workflow and open saved evidence. It does not execute an agent or issue a refund. Use the CLI below when you want a fresh test run.</p></article>
+        <article class="component"><p class="eyebrow">This website</p><h3>Explains and displays evidence</h3><p>This walkthrough explains the examples. The <a href="viewer.html">trace viewer</a> opens your own recorded JSON locally. Neither page executes an agent or issues a refund. Use the CLI for full consistency checks and fresh test runs.</p></article>
       </div>
       <div class="connection"><strong>Request → agent → fault middleware → payment service → agent reply.</strong><br>The recorder follows the whole interaction. The verifier checks the ledger and recorded evidence after execution.</div>
     </section>
@@ -80,6 +80,7 @@
         <a class="report" href="timeout-corrected.html"><p class="eyebrow">Corrected agent / Pass</p><strong>300 cents refunded ↗</strong><span>The original refund is confirmed. One request produces one economic effect. Open the corrected rerun.</span></a>
         <a class="report" href="no-api-validation.html"><p class="eyebrow">Offline / Repeated trials</p><strong>40 / 40 corrected passes ↗</strong><span>The flawed script failed 30 of 40 trials. These are measured scripted results, with no model API calls.</span></a>
       </div>
+      <p class="section-intro">Have your own run? <a href="viewer.html">Open its trace JSON in the offline viewer</a> to inspect the recorded rules, tools, claims, and ledger.</p>
     </section>
     <section class="section" id="try-it">
       <p class="eyebrow">Run the project</p><h2>You can test this without an API key.</h2>
