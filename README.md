@@ -35,6 +35,11 @@ runner script; different framework interfaces still need tool routing and claim
 translation. Factories create a fresh target per trial and are never loaded
 automatically from recorded traces.
 
+**Choose your own tool-call requirements in YAML:** require a payment lookup
+before refund creation, cap attempts per request, and keep retry arguments stable.
+These deterministic rules complement the financial verifier and report the exact
+violating events. See [tool-rule semantics and runnable examples](docs/TOOL_RULES.md).
+
 ## Quick start (no API key)
 
 ```bash

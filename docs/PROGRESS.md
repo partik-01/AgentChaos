@@ -369,7 +369,7 @@ This removes a separate custom runner and suite loop, not the need to bridge a
 different framework's tools/output to the refund boundary. No live model calls,
 automatic framework discovery, HTTP integration, or new workflow is claimed.
 The task is complete; no following improvement was started.
-## Configurable tool-call rules — in progress
+## Configurable tool-call rules — completed
 
 One task: optional YAML call-order, maximum-call and consistent-retry-argument
 rules. Define exact semantics first in [TOOL_RULES.md](TOOL_RULES.md). Validate
@@ -379,3 +379,24 @@ precedence, recheck policies during playback/rerun, and keep old traces readable
 Add a separate sample (without altering historical benchmark scenarios), test
 rules independently and through custom CLI targets, document measured evidence,
 commit small improvements sequentially, then push to GitHub.
+
+`4e0a202` defined the scope and semantics before coding; `cf41712` added strict
+rule contracts and deterministic checks integrated with the verifier and trace
+validation; `1f78530` added the separate sample and 25 focused tests. The tests
+cover matching/order, faulted attempts, grouping, zero limits, exact arguments,
+invalid/missing configuration, financially correct policy failures, rerun,
+HTML evidence, old-trace compatibility, tampered verdicts and harness precedence.
+
+Actual installed CLI review: 5 flawed failures / 5 trials (retry-key policy and
+financial violations); 5 corrected passes / 5; 5 custom corrected failures / 5
+(missing prior lookup despite exactly 300 cents refunded). No harness errors or
+inconclusive runs. All 15 traces and a corrected rerun validated. Inspection,
+JSON/HTML export and suite reports worked. Evidence remains local under
+`runs/tool-rule-review/`, including exact commands. Historical scenarios and
+benchmark counts were not changed.
+
+Final verification: **242 Python tests and 17 JavaScript tests passed**, with
+lint, format and diff checks passing. An initial lint run caught an unused test
+import, which was removed. No model API call or broad workflow support is claimed.
+The rules check attempted calls, not successful authorization; independent
+financial verification remains required. No following improvement was started.

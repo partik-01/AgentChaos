@@ -30,8 +30,10 @@ a scenario hash and internal consistency checks cannot prove external provenance
 
 `src/agent_chaos/traces.py` defines the required sections and nested records with
 Pydantic. Input is parsed strictly without silently coercing cents, counters,
-seeds, or identifiers. Recorded scenarios include every scenario field, including
-their explicit version. Timestamps require an ISO format and timezone. Latencies,
+seeds, or identifiers. New recorded scenarios include every scenario field,
+including their explicit version and optional `tool_rules`. Older version-1
+traces may omit `tool_rules`, meaning no extra tool policies. Timestamps require
+an ISO format and timezone. Latencies,
 costs, token counts and fault draws are bounded; all JSON values must be finite.
 Unknown record fields are rejected except extensible agent metadata. The existing
 portable examples' optional `export_note` remains supported.
@@ -57,7 +59,9 @@ claim template. Provider text remains separately unassessed. Recorded model usag
 must sum the per-call usage, which must agree with the raw provider response.
 
 The recorded verdict, expected intents, violations and conversational assessment
-must agree with a fresh deterministic verification of the evidence. Partial
+must agree with a fresh deterministic verification of the evidence. Configured
+tool-policy failures are also recomputed from the recorded scenario and attempted
+calls; changing/removing a violation cannot produce a valid pass. Partial
 provider failures and recorded invalid-output exceptions keep their existing
 harness/agent classifications and financial consequences. Single-run trial counts
 must agree with the verdict. Reproduction commands must have the expected

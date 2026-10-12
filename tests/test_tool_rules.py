@@ -93,6 +93,8 @@ def test_consistency_uses_first_call_exact_values_and_separate_requests():
     assert failure["event_indices"] == [0, 3]
     assert failure["expected"]["arguments"] == {"idempotency_key": "one", "amount_cents": 300}
     assert not check_tool_rules([policy], calls[:3])
+    calls[0]["arguments"]["amount_cents"] = 1
+    calls[2]["arguments"]["amount_cents"] = 1
     calls[3]["arguments"] = calls[0]["arguments"] | {"amount_cents": True}
     assert check_tool_rules([policy], calls)
 

@@ -97,6 +97,12 @@ An unexecuted or broken test is a harness error. Incorrect or missing customer
 claims and target step-budget exhaustion are agent failures. Financial failures
 retain priority over uncertainty or unassessed conversational quality.
 
+Optional scenario `tool_rules` check attempted tool-call order, counts and
+argument consistency independently of ledger correctness. Faulted calls count;
+order does not prove successful observation. Violations are named
+`tool_rule:<id>` and carry exact event references. Harness errors retain
+precedence. See [configuration and exact grouping semantics](TOOL_RULES.md).
+
 The scripted agents use deterministic sentence templates. Real model runs expose
 structured claims for these checks, but their accompanying prose is recorded as
 **unassessed**: no model judge is included, and otherwise correct live runs are
