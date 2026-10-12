@@ -81,8 +81,8 @@ class Response(Record):
 
 
 class Configuration(Record):
-    provider: Literal["scripted", "openai"]
-    agent_version: Literal["flawed", "corrected"]
+    provider: Literal["scripted", "openai", "custom"]
+    agent_version: Annotated[str, Field(min_length=1)]
     model: str | None
     seed: StrictInt
 

@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import __version__
+from .adapters import RefundAgent
 from .agents import AgentFailure, ScriptedAgent
 from .faults import FaultMiddleware
 from .payments import PaymentService
@@ -36,7 +37,7 @@ def run_scenario(
     initial: dict | None = None,
     provider="scripted",
     model: str | None = None,
-    agent=None,
+    agent: RefundAgent | None = None,
     parent_run: str | None = None,
 ) -> dict:
     start = time.perf_counter()
@@ -178,9 +179,24 @@ def unique_json_keys(pairs):
     return data
 
 
-def rerun(trace: dict, *, out="runs", agent_version=None, provider=None, model=None) -> dict:
+def rerun(
+    trace: dict,
+    *,
+    out="runs",
+    agent_version=None,
+    provider=None,
+    model=None,
+    agent: RefundAgent | None = None,
+) -> dict:
     validate_trace(trace)
     config = trace["configuration"]
+    custom = config["provider"] == "custom" or trace["agent"].get("kind") not in ("scripted", "llm")
+    if custom and agent is None and provider is None:
+        raise ValueError(
+            "Custom-agent reruns require a fresh agent instance via Python rerun(..., agent=...). "
+            "Use the adapter's runner; traces never load adapter code. "
+            "To deliberately switch to a built-in agent, specify provider explicitly."
+        )
     return run_scenario(
         Scenario.model_validate(trace["scenario"]),
         agent_version or config["agent_version"],
@@ -188,6 +204,7 @@ def rerun(trace: dict, *, out="runs", agent_version=None, provider=None, model=N
         initial=trace["initial_state"],
         provider=provider or config["provider"],
         model=model or config.get("model"),
+        agent=agent,
         parent_run=trace["run_id"],
     )
 
