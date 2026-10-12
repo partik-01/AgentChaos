@@ -1,3 +1,7 @@
+import importlib.util
+import json
+from pathlib import Path
+
 import pytest
 
 from agent_chaos.agents import claim
@@ -5,6 +9,13 @@ from agent_chaos.cli import main
 from agent_chaos.runner import read_trace, rerun, run_scenario
 from agent_chaos.schema import load_scenario
 from agent_chaos.traces import validate_trace
+
+
+def example_module():
+    spec = importlib.util.spec_from_file_location("custom_example", "examples/custom_agent.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 class CustomerAgent:
@@ -82,3 +93,43 @@ def test_custom_without_target_and_unassessed_prose_never_pass(tmp_path):
     trace = run_scenario(scenario, "my-agent-1", provider="custom", agent=agent, out=tmp_path)
     validate_trace(trace)
     assert trace["result"]["status"] == "inconclusive"
+
+
+@pytest.mark.parametrize("scenario_path", sorted(Path("scenarios").glob("*.yaml")))
+def test_example_corrected_handles_development_scenarios(scenario_path, tmp_path):
+    agent = example_module().MySupportAgent()
+    trace = run_scenario(
+        load_scenario(scenario_path),
+        agent.metadata["version"],
+        provider="custom",
+        agent=agent,
+        out=tmp_path,
+    )
+    validate_trace(trace)
+    assert trace["result"]["status"] == "pass"
+
+
+def test_example_runner_failure_playback_reproduction_and_fix(tmp_path, capsys):
+    example = example_module()
+    assert (
+        example.main(
+            ["run", "scenarios/03_after_timeout.yaml", "--policy", "flawed", "--out", str(tmp_path)]
+        )
+        == 1
+    )
+    output = json.loads(capsys.readouterr().out)
+    recorded = read_trace(output["trace"])
+    assert sum(r["amount_cents"] for r in recorded["final_state"]["refunds"]) == 600
+    assert main(["inspect", output["trace"]]) == 0
+    capsys.readouterr()
+    before = Path(output["trace"]).read_bytes()
+    for policy, expected_exit, amount in [("flawed", 1, 600), ("corrected", 0, 300)]:
+        assert (
+            example.main(["rerun", output["trace"], "--policy", policy, "--out", str(tmp_path)])
+            == expected_exit
+        )
+        fresh = read_trace(json.loads(capsys.readouterr().out)["trace"])
+        assert fresh["parent_run"] == recorded["run_id"]
+        assert fresh["initial_state"] == recorded["initial_state"]
+        assert sum(r["amount_cents"] for r in fresh["final_state"]["refunds"]) == amount
+    assert Path(output["trace"]).read_bytes() == before
