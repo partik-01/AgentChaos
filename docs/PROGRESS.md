@@ -489,3 +489,16 @@ Commit checkpoints: `5893bc9` contract, `08c0448` execution/CLI/trace integratio
 documentation/validation follows as a separate commit. Validation used
 macOS/Python 3.12 and scripted agents; no live-model benchmark, remote CI or
 Linux/Windows execution is claimed. No following task was started.
+
+## Partial suite access — in progress
+
+One improvement: save suite JSON/HTML checkpoints before and after each trial.
+Factory errors already become recorded harness-error trials; preserve that
+continuation behavior. Add explicit running/completed/interrupted/harness-error
+progress with planned, completed and remaining counts and the active trial.
+Unexpected runner exceptions or Ctrl+C retain completed traces and cannot report
+suite success. Add direct links to completed run evidence, atomic HTML writes,
+tests for interruption/error/recovery boundaries, documentation and a final push.
+All scenarios still validate before execution. Abrupt termination may leave the
+last checkpoint marked running; this does not claim the suite finished. No
+automatic resume or concurrent writers to the same output directory in this task.
