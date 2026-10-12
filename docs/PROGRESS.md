@@ -1,6 +1,6 @@
 # Agent Chaos progress
 
-Updated: 2026-10-08. Work is sequential, with a commit for each reviewable
+Updated: 2026-10-12. Work is sequential, with a commit for each reviewable
 improvement. The user now requests a checkpoint and approval of the next task
 before starting it.
 
@@ -175,3 +175,23 @@ Vercel metadata. Documented the production deployment command.
 Vercel CLI rejected its saved token. Started device authentication and opened the
 sign-in page for the user. Production deployment and the live README link are
 pending successful account authentication; no deployed URL is claimed yet.
+
+## Completed system review and cleanup — 2026-10-12
+
+Reviewed the source, CLI, offline workflows, website and deployment state.
+Removed one unused fault field in its own commit. Then fixed comparison exit
+codes so a flawed-side harness error or inconclusive trial cannot be hidden by
+corrected-side passes, with seven new regression cases and its own commit.
+
+Final checks: 69 tests passed; lint, format, JavaScript syntax and local website
+links passed. Fresh five-trial comparisons across ten scenarios: corrected
+50/50 passes; flawed 40/50 failures, with zero harness errors or inconclusive
+runs. Timeout rerun reproduced 600 cents; corrected rerun committed 300 cents.
+Generation, minimization, study, playback and JSON/HTML export were exercised.
+Browser checks confirmed both policies and saved report navigation.
+
+Full scope, commands, measured counts, limits and proposed next tasks are in
+[REVIEW.md](REVIEW.md). Local evidence is in `runs/review-2026-10-12/`.
+Vercel remains logged out; live model execution and remote CI are unverified.
+This review/cleanup task is complete. Ask for the next task before implementing
+any of the proposed additions.
