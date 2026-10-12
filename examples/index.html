@@ -26,6 +26,22 @@
       <h1>Follow a refund through Agent Chaos.</h1>
       <p class="lead">An agent says it refunded the customer. Did it refund the right amount, once? Walk through what happens when the payment tool succeeds but its response goes missing.</p>
     </section>
+    <section class="section" id="how-it-works" aria-labelledby="how-it-works-title">
+      <p class="eyebrow">Who does what?</p>
+      <h2 id="how-it-works-title">OpenAI decides. Our simulator executes.</h2>
+      <p class="section-intro">OpenAI supplies the agent’s reasoning. Agent Chaos supplies the payment tools and a local SQLite database of simulated payments. OpenAI never processes a payment here. No real money moves.</p>
+      <ol class="project-grid" style="list-style:none;padding:0" aria-label="From customer request to verified result">
+        <li class="component"><p class="eyebrow">Step 1 / Customer</p><h3>“Refund $3 from my payment.”</h3><p>The test gives the agent a customer request and starts with a known simulated payment balance.</p></li>
+        <li class="component"><p class="eyebrow">Step 2 / Agent reasoning</p><h3>Choose a tool to call</h3><p>The OpenAI model decides to request <code>create_refund</code>, with the payment, customer, amount and idempotency key. The model proposes the call; the harness executes it.</p></li>
+        <li class="component"><p class="eyebrow">Step 3 / Local simulator</p><h3>Record the refund</h3><p>The payment service checks the request and records a $3 refund in SQLite. This database is the authoritative record of what happened in the test.</p></li>
+        <li class="component"><p class="eyebrow">Step 4 / Injected fault</p><h3>Hide the successful response</h3><p>Agent Chaos makes the agent receive a timeout after the refund succeeds. The database shows $3 refunded, but the agent has not received confirmation.</p></li>
+        <li class="component"><p class="eyebrow">Step 5 / Agent recovery</p><h3>Retry, check, or report uncertainty</h3><p>The agent decides what to do next and what to tell the customer. A timeout alone does not prove that the refund failed.</p></li>
+        <li class="component"><p class="eyebrow">Step 6 / Independent verifier</p><h3>Check what actually happened</h3><p>The verifier reads the ledger and tool evidence. It checks the refund amount, duplicate effects and structured outcome claims. Free-form model prose is recorded separately and remains unassessed.</p></li>
+      </ol>
+      <div class="connection"><strong>Why this test matters:</strong> a flawed agent retries with a new idempotency key and refunds $6 instead of $3. The corrected agent confirms the original refund or retries with the same key, keeping the total at $3. If it cannot verify completion, it must report uncertainty.</div>
+      <p class="section-intro" style="margin-top:18px"><strong>No API key?</strong> The included scripted agents follow predefined logic through the same simulator, faults and verifier. The walkthrough below shows those recorded offline results; it does not call OpenAI.</p>
+      <p class="section-intro"><strong>Current scope:</strong> one model provider (OpenAI) and one workflow (simulated refunds). Other agents require a Python adapter; other workflows need their own simulated service and correctness rules.</p>
+    </section>
     <noscript><p>Enable JavaScript to step through the refund. The project map and recorded reports below are available without it.</p></noscript>
     <section class="walkthrough" id="walkthrough" aria-label="Interactive workflow explanation">
       <div class="toolbar">
