@@ -5,6 +5,39 @@ workflow**. You can use your own agent logic or model client. It does not accept
 an arbitrary API URL, discover your tools, or verify other business workflows.
 The adapter is local code you explicitly run; recorded traces never import it.
 
+## Use the standard CLI without a separate runner
+
+If your agent already exposes `metadata` and `run_turn(turn, tools)`, provide a
+zero-argument function or class that creates a fresh instance. Load it directly:
+
+```bash
+agent-chaos run scenarios/03_after_timeout.yaml --agent-factory examples.custom_agent:make_flawed_agent
+# Exits 1; copy the printed run ID into the path below.
+agent-chaos rerun runs/<run-id>/trace.json --agent-factory examples.custom_agent:make_corrected_agent
+agent-chaos suite scenarios --agent-factory examples.custom_agent:make_corrected_agent --trials 5
+```
+
+Replace `examples.custom_agent:make_corrected_agent` with `my_agent:create_agent`
+for your own importable module. Modules can be in the current working directory
+or installed in the active Python environment. A class with a zero-argument
+constructor also works. The factory must return a **new instance on every call**;
+the suite calls it once per trial. Constructor failures and invalid metadata exit
+2, never pass. The factory must provide `kind: custom`, a nonempty `version`, and
+`conversation_assessment` (`unassessed` or `deterministic_templates`), with
+JSON-compatible trace metadata and a callable `run_turn`.
+
+The factory supplies target identity and model information; keep the built-in
+`--agent`, `--provider` and `--model` options at their defaults. Scenario loading
+and full rerun validation happen before factory import. The factory reference is
+recorded for provenance, but rerun requires it explicitly again. Importing a
+factory executes its Python code with your process permissions; select code you
+intend to run. Inspection and export never import it.
+
+**What this removes:** writing your own test runner, suite loop and rerun wiring.
+**What remains:** adapting a framework whose interface differs, translating its
+output to `Claim` objects, and routing all payment calls through `tools.call`.
+There is no automatic framework discovery or arbitrary API URL input.
+
 ## Run the independent example without an API key
 
 Install the project using the README quick start, then run from the repository:
@@ -121,15 +154,17 @@ each `run_scenario`, then use `summarize(traces)` to report counts.
 
 The generic trace reproduction command remains `agent-chaos rerun <trace>`.
 For a custom target, that command refuses execution with instructions to supply
-its adapter; use your adapter runner or the Python call above. It never silently
+its adapter; add `--agent-factory module:callable`, use your adapter runner, or use
+the Python call above. It never silently
 substitutes a built-in policy. To deliberately compare with the built-in target:
 
 ```bash
 agent-chaos rerun runs/custom/<run-id>/trace.json --provider scripted --agent corrected
 ```
 
-Custom targets currently use the Python API or their own runner. The generic
-CLI `suite`, `compare`, `minimize`, and `study` do not load custom adapters. The
+Custom targets can use `run`, `suite` and `rerun` with `--agent-factory`, the
+Python API, or their own runner. Generic CLI `compare`, `minimize`, and `study`
+do not load custom adapters. Run two matched-seed suites to compare custom versions. The
 website can display their recorded traces but cannot execute them. The example
 and scenario files are repository assets, not bundled wheel contents.
 

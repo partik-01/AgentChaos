@@ -340,7 +340,7 @@ the new Markdown guide; formatting them resolved it. No live model/API call or
 external adoption is claimed. This is a Python integration for the refund
 sandbox, not arbitrary endpoint or workflow support. No following feature was
 started.
-## CLI custom-agent loading — in progress
+## CLI custom-agent loading — completed
 
 Reduce integration boilerplate within the refund workflow: add an explicit
 `--agent-factory module:callable` to run, suite and rerun. Load user-selected local
@@ -350,3 +350,22 @@ before importing target code. Never auto-import a recorded factory. Demonstrate
 normal/faulted execution and a corrected custom rerun through the standard CLI.
 Document that framework tool routing still requires integration. No HTTP agent
 protocol, arbitrary workflow or automatic framework discovery in this task.
+
+Sequential commits: `aab3804` scoped the task; `8543bc9` added the explicit
+factory loader, target/metadata validation, CLI run/suite/rerun support and tests;
+`6df7103` recorded factory provenance and improved rerun guidance while testing
+that recorded factory references never trigger imports. README and the custom
+agent/usability guides now explain direct CLI loading and remaining adaptation.
+
+Verification: **215 Python tests and 17 JavaScript tests passed**, plus lint,
+format and diff checks. Actual installed console-script commands exercised 83
+offline target executions: normal flawed pass, timeout flawed failure, corrected
+restored-state rerun, and 40 trials per custom policy. Flawed suite: 25 failures /
+40; corrected: 0 failures / 40; neither had harness errors or inconclusive runs.
+Inspection succeeded and suite JSON/HTML reports were written. Local command
+evidence is in `runs/factory-cli-review/commands.json` and its run directories.
+
+This removes a separate custom runner and suite loop, not the need to bridge a
+different framework's tools/output to the refund boundary. No live model calls,
+automatic framework discovery, HTTP integration, or new workflow is claimed.
+The task is complete; no following improvement was started.

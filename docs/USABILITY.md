@@ -70,7 +70,9 @@ mock HTTP transport, but no live model benchmark was performed. Otherwise-correc
 live traces remain inconclusive because conversational prose is unassessed.
 
 The CLI's `--agent` selects the built-in flawed/corrected policies; it does not
-load arbitrary agent code. Other agents need a Python adapter passed through
+load arbitrary agent code. `--agent-factory module:callable` explicitly loads a
+custom target for `run`, `suite` and `rerun`, removing the separate runner script.
+Agents with a different interface still need a Python adapter, passed through
 `run_scenario(scenario, agent=adapter, ...)`. It must expose JSON-compatible
 `metadata` and `run_turn(turn, tools)`, returning a list of `Claim` objects. Route
 the simulated payment calls through `tools.call(name, arguments)` so faults and
@@ -80,7 +82,7 @@ extension point, not broad framework interoperability or a stable plugin ABI.
 
 A [custom-agent integration guide](CUSTOM_AGENTS.md) now defines that boundary
 and provides an independent offline target, trial loop, and restored-state rerun.
-Custom traces require an explicit fresh adapter for execution; playback/export
+Custom traces require an explicit factory or fresh adapter for execution; playback/export
 remain available through the generic CLI. No adapter code is loaded from traces.
 
 There is no real payment integration, hosted execution backend, production

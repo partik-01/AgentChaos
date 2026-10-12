@@ -22,6 +22,19 @@ integration guide](docs/CUSTOM_AGENTS.md) demonstrate a duplicate refund and a
 corrected restored-state rerun without an API key. Arbitrary API URLs and other
 workflows remain outside the current scope.
 
+You can load a compatible custom target directly with the standard CLI:
+
+```bash
+agent-chaos run scenarios/03_after_timeout.yaml --agent-factory examples.custom_agent:make_flawed_agent
+agent-chaos suite scenarios --agent-factory examples.custom_agent:make_corrected_agent --trials 5
+agent-chaos rerun runs/<run-id>/trace.json --agent-factory examples.custom_agent:make_corrected_agent
+```
+
+Replace the factory with your own `my_agent:create_agent`. This removes a separate
+runner script; different framework interfaces still need tool routing and claim
+translation. Factories create a fresh target per trial and are never loaded
+automatically from recorded traces.
+
 ## Quick start (no API key)
 
 ```bash
