@@ -3,6 +3,7 @@
 from collections import Counter, defaultdict
 
 from .schema import Scenario
+from .tool_rules import check_tool_rules
 
 
 def expected_intents(scenario: Scenario, initial: dict) -> list[dict]:
@@ -38,7 +39,7 @@ def verify(
     harness_error: str | None = None,
     conversation_assessment: str = "deterministic_templates",
 ) -> dict:
-    violations = []
+    violations = check_tool_rules(scenario.tool_rules, events)
 
     def fail(rule, expected, observed, evidence=None):
         violations.append(

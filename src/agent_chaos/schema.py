@@ -48,6 +48,61 @@ class Fault(StrictModel):
         return self
 
 
+class CallOrderRule(StrictModel):
+    id: Identifier
+    kind: Literal["call_order"]
+    before: ToolName
+    after: ToolName
+    match_fields: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def valid_fields(self):
+        if self.before == self.after:
+            raise ValueError("call_order requires different before and after tools")
+        validate_rule_fields(self.match_fields, self.before, self.after)
+        return self
+
+
+class MaxCallsRule(StrictModel):
+    id: Identifier
+    kind: Literal["max_calls"]
+    tool: ToolName
+    max: Annotated[StrictInt, Field(ge=0)]
+    group_by: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def valid_fields(self):
+        validate_rule_fields(self.group_by, self.tool)
+        return self
+
+
+class ConsistentArgsRule(StrictModel):
+    id: Identifier
+    kind: Literal["consistent_args"]
+    tool: ToolName
+    fields: list[str] = Field(min_length=1)
+    group_by: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def valid_fields(self):
+        validate_rule_fields(self.fields, self.tool)
+        validate_rule_fields(self.group_by, self.tool)
+        if set(self.fields) & set(self.group_by):
+            raise ValueError("consistent_args fields must not overlap group_by")
+        return self
+
+
+ToolRule = Annotated[CallOrderRule | MaxCallsRule | ConsistentArgsRule, Field(discriminator="kind")]
+
+
+def validate_rule_fields(fields, *tools):
+    if len(fields) != len(set(fields)):
+        raise ValueError("rule fields must be unique")
+    for tool in tools:
+        if not set(fields) <= TOOL_MODELS[tool].model_fields.keys():
+            raise ValueError(f"rule fields are not supported arguments for {tool}")
+
+
 class Scenario(StrictModel):
     version: Literal[1] = 1
     name: Identifier
@@ -57,6 +112,7 @@ class Scenario(StrictModel):
     payments: list[Payment] = Field(min_length=1)
     turns: list[Turn] = Field(min_length=1)
     faults: list[Fault] = Field(default_factory=list)
+    tool_rules: list[ToolRule] = Field(default_factory=list)
     split: Literal["development", "heldout", "generated"] = "development"
 
     @model_validator(mode="after")
@@ -67,6 +123,9 @@ class Scenario(StrictModel):
         slots = [(f.tool, f.occurrence) for f in self.faults]
         if len(slots) != len(set(slots)):
             raise ValueError("only one fault per tool invocation")
+        rule_ids = [rule.id for rule in self.tool_rules]
+        if len(rule_ids) != len(set(rule_ids)):
+            raise ValueError("tool rule IDs must be unique")
         seen = {}
         executed_amounts = {}
         for turn in self.turns:

@@ -380,7 +380,7 @@ def validate_trace(data: dict) -> dict:
     except (ValidationError, ValueError, TypeError) as exc:
         raise ValueError(f"invalid trace structure: {exc}") from exc
     require(
-        set(Scenario.model_fields) <= data["scenario"].keys(),
+        (set(Scenario.model_fields) - {"tool_rules"}) <= data["scenario"].keys(),
         "scenario",
         "missing recorded scenario fields",
     )
