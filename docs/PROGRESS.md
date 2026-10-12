@@ -290,3 +290,10 @@ format passed. Local evidence and screenshot are in `runs/viewer-usability/`.
 needed for other agents, browser display-versus-validation distinction, missing
 live-model/adoption evidence and pending Vercel authentication. No following
 feature was started.
+## Plain-language website workflow — in progress
+
+Scope: explain that OpenAI supplies reasoning while Agent Chaos executes local
+simulated payment tools. Add an always-visible six-step flow, the $3/$6 timeout
+example, the no-key scripted alternative, and current refund-only scope. Keep
+the existing interactive demonstration. Verify the rendered page and existing
+website tests, commit small changes sequentially, then push to GitHub.
