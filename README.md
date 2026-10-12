@@ -139,6 +139,20 @@ Customer request → agent → fault middleware → simulated payment service �
 The recorder saves the interaction; the independent verifier checks authoritative
 state and observations available before each reply.
 
+```mermaid
+flowchart LR
+  Customer --> Agent
+  Agent -->|Tool call| Faults[Fault middleware]
+  Faults -->|Execute when allowed| Ledger[SQLite payment simulator]
+  Ledger -->|Backend result| Faults
+  Faults -->|Observed result or fault| Agent
+  Agent -->|Reply| Customer
+  Faults --> Recorder[Trace recorder]
+  Ledger -->|Authoritative snapshots| Verifier[Independent verifier]
+  Recorder -->|Calls and responses| Verifier
+  Verifier --> Reports[JSON and HTML reports]
+```
+
 The service enforces ownership, remaining balance and global idempotency keys.
 The verifier checks exact amounts, duplicate economic effects, unrelated state,
 structured claims and optional tool rules. [API semantics](docs/API.md) define

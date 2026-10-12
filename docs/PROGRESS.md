@@ -400,7 +400,7 @@ lint, format and diff checks passing. An initial lint run caught an unused test
 import, which was removed. No model API call or broad workflow support is claimed.
 The rules check attempted calls, not successful authorization; independent
 financial verification remains required. No following improvement was started.
-## Developer documentation and onboarding — in progress
+## Developer documentation and onboarding — completed
 
 One documentation task: reorganize the README around a first successful local
 run and a reproducible failure/fix; add a documentation index, setup/CLI/scenario
@@ -410,3 +410,26 @@ exit codes, evidence paths, platform commands, custom integration limits and
 supported workflows. Verify offline commands and relative links from a fresh
 installation, run applicable checks, commit each focused improvement, and push.
 No runtime feature, deployment, new provider or benchmark claim in this task.
+
+Sequential commits: `bb45746` scoped the task; `fd39c28` reorganized the README
+and added setup/documentation index; `5f50b39` added CLI, scenario and
+troubleshooting references; `98e7fec` added contribution instructions, community
+issue/PR templates and a clear distinction between adapter stubs and the complete
+runnable example. Final polish adds the architecture diagram and links from
+historical evidence to the current guides.
+
+Fresh onboarding verification: local Git clone outside the workspace, new venv,
+runtime-only editable install and pip check. Fourteen command invocations
+produced 120 validated executions: 89 passes and 31 intended agent failures;
+no harness errors or inconclusive runs. They covered first run, saved failure/
+fix, custom loading/rerun, core/reserved comparisons, tool-policy suite, export,
+and YAML copied directly from the guide. Imports came from the fresh checkout;
+JSON/HTML reports existed. A raw-path assertion initially hit macOS /var versus
+/private/var aliases; resolved paths confirmed the install. Evidence is in
+`runs/documentation-review/fresh-install.json`.
+
+All checked relative documentation links resolved. Final local regression check:
+**242 Python tests and 17 JavaScript tests passed**; lint/format/diff checks passed.
+Windows commands and remote CI were not verified. No live-model calls, external
+adoption or public deployment are claimed. Runtime behavior is unchanged; no
+following feature was started.

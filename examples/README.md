@@ -1,5 +1,10 @@
 # Measured offline evidence
 
+New here? Start with [setup and your first run](../docs/GETTING_STARTED.md).
+For commands, integrations and scenario authoring, use the
+[documentation index](../docs/README.md). The dated results below describe the
+specific policies and inputs measured at those checkpoints.
+
 These files were produced by actual scripted executions on 2026-10-07. No model
 API key or live model call was used. HTML reports open directly in a browser.
 

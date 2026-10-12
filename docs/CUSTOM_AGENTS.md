@@ -161,8 +161,8 @@ each `run_scenario`, then use `summarize(traces)` to report counts.
 The generic trace reproduction command remains `agent-chaos rerun <trace>`.
 For a custom target, that command refuses execution with instructions to supply
 its adapter; add `--agent-factory module:callable`, use your adapter runner, or use
-the Python call above. It never silently
-substitutes a built-in policy. To deliberately compare with the built-in target:
+the Python call above. It never silently substitutes a built-in policy. To
+deliberately compare with the built-in target:
 
 ```bash
 agent-chaos rerun runs/custom/<run-id>/trace.json --provider scripted --agent corrected
@@ -171,8 +171,8 @@ agent-chaos rerun runs/custom/<run-id>/trace.json --provider scripted --agent co
 Custom targets can use `run`, `suite` and `rerun` with `--agent-factory`, the
 Python API, or their own runner. Generic CLI `compare`, `minimize`, and `study`
 do not load custom adapters. Run two matched-seed suites to compare custom
-versions. The website can display their recorded traces but cannot execute them. The example
-and scenario files are repository assets, not bundled wheel contents.
+versions. The website can display their recorded traces but cannot execute them.
+The example and scenario files are repository assets, not bundled wheel contents.
 
 ## Repeated offline regression commands
 

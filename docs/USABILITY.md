@@ -123,3 +123,25 @@ evidence inspection; early-stage and adapter-dependent for other people's real
 agents. The attractive walkthrough alone would be a demonstration. The CLI's
 new executions, authoritative ledger, verifier, and rerun evidence are the useful
 testing system behind it.
+
+## Documentation onboarding verification — 2026-10-12
+
+The [setup guide](GETTING_STARTED.md), [CLI reference](CLI.md),
+[scenario authoring guide](SCENARIOS.md), [troubleshooting](TROUBLESHOOTING.md)
+and [contribution instructions](../CONTRIBUTING.md) now separate first-use tasks
+from API details and historical implementation records.
+
+Verification used a fresh local Git clone in a temporary directory, a new
+virtual environment and the documented runtime-only editable installation.
+Fourteen command invocations covered setup/help, baseline, saved failure/fix,
+custom factory run/rerun, repeated suites, core/reserved comparisons, tool rules,
+export and the complete YAML copied from the scenario guide. All 120 resulting
+traces validated; intentional failures remained failures. Package imports were
+confirmed to come from the fresh clone; `pip check` passed. Generated JSON/HTML
+reports existed. No model key was needed.
+
+This tests the documented local developer path, not independent adoption or
+Windows execution. Windows instructions are provided but were not run. A raw
+path comparison initially confused macOS `/var` and `/private/var` aliases;
+resolved paths confirmed the expected environment without repeating execution.
+Local verification evidence: `runs/documentation-review/fresh-install.json`.
