@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Inspect an Agent Chaos refund trace locally, without uploading it or running an agent.">
+  <title>Agent Chaos · Trace viewer</title>
+  <link rel="stylesheet" href="viewer.css">
+  <script src="viewer.js" defer></script>
+</head>
+<body>
+  <header><a href="index.html">↯ Agent Chaos</a><a href="https://github.com/partik-01/ChaoticAgent">Source and CLI setup ↗</a></header>
+  <main>
+    <p class="eyebrow">Offline evidence inspection</p>
+    <h1>Open a run. Follow the evidence.</h1>
+    <p class="lead">Read your own saved Agent Chaos trace, including the tool failure, refund ledger, and customer-facing claims. No API key required.</p>
+    <section class="import" aria-label="Import a trace">
+      <label for="trace-file">Choose trace JSON</label>
+      <input id="trace-file" type="file" accept=".json,application/json" aria-describedby="file-help">
+      <p id="file-help">Single-run version-1 traces, up to 10 MiB. Selected files stay in this browser tab: no upload, analytics, or saved browser storage.</p>
+      <div class="samples"><span>Or open a recorded example:</span><button type="button" data-sample="timeout-flawed.json">Flawed timeout trace</button><button type="button" data-sample="timeout-corrected.json">Corrected timeout trace</button></div>
+      <button type="button" id="clear" disabled>Clear trace</button>
+      <p id="import-status" role="status" aria-live="polite">No trace loaded.</p>
+    </section>
+    <aside class="notice"><strong>A viewer, not a verifier.</strong> The page checks whether data can be displayed, then shows the recorded verdict. It does not recompute the scenario hash, fault schedule, or financial verdict. Use <code>agent-chaos inspect path/to/trace.json</code> for full offline consistency validation. Neither tool proves that a recording is authentic. This page cannot execute agents or rerun a scenario.</aside>
+    <noscript><p>JavaScript is required to read local JSON. You can inspect the same file using the CLI.</p></noscript>
+    <div id="trace-output" hidden></div>
+  </main>
+  <footer>Simulated payments only · MIT licensed · A recorded pass is not a live-model reliability guarantee.</footer>
+</body>
+</html>
