@@ -195,3 +195,12 @@ Full scope, commands, measured counts, limits and proposed next tasks are in
 Vercel remains logged out; live model execution and remote CI are unverified.
 This review/cleanup task is complete. Ask for the next task before implementing
 any of the proposed additions.
+
+## Full trace validation task — in progress
+
+The user authorized full trace validation and a final GitHub push. The work plan
+and acceptance rules are in [TRACE_VALIDATION.md](TRACE_VALIDATION.md): typed
+contracts, cross-section checks, validation before all trace-consuming CLI paths
+and direct rerun execution, damaged-trace regressions, and compatibility checks
+for recorded failures and partial harness errors. No other feature task is being
+started.
