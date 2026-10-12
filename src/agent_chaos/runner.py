@@ -194,7 +194,8 @@ def rerun(
     if custom and agent is None and provider is None:
         raise ValueError(
             "Custom-agent reruns require a fresh agent instance via Python rerun(..., agent=...). "
-            "Use the adapter's runner; traces never load adapter code. "
+            "Use CLI --agent-factory module:callable or the adapter's runner; "
+            "traces never load adapter code. "
             "To deliberately switch to a built-in agent, specify provider explicitly."
         )
     return run_scenario(

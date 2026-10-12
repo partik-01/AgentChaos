@@ -30,8 +30,9 @@ def execution_options(parser, *, custom=False):
         )
 
 
-def custom_options(factory):
+def custom_options(factory, reference):
     target = create_custom_agent(factory)
+    target.metadata = dict(target.metadata, factory_reference=reference)
     return {
         "agent": target,
         "agent_version": target.metadata["version"],
@@ -59,7 +60,7 @@ def execute_suite(args, agent):
         for trial in range(args.trials):
             seed = (args.seed if args.seed is not None else scenario.seed) + trial
             options = (
-                custom_options(factory)
+                custom_options(factory, args.agent_factory)
                 if factory
                 else {"agent_version": agent, "provider": args.provider, "model": args.model}
             )
@@ -221,7 +222,7 @@ def main(argv=None):
             if args.seed is not None:
                 scenario = scenario.model_copy(update={"seed": args.seed})
             options = (
-                custom_options(load_agent_factory(args.agent_factory))
+                custom_options(load_agent_factory(args.agent_factory), args.agent_factory)
                 if args.agent_factory
                 else {"agent_version": args.agent, "provider": args.provider, "model": args.model}
             )
@@ -268,7 +269,7 @@ def main(argv=None):
         if args.command == "rerun":
             recorded = read_trace(args.trace)  # Validate before importing user-selected code.
             options = (
-                custom_options(load_agent_factory(args.agent_factory))
+                custom_options(load_agent_factory(args.agent_factory), args.agent_factory)
                 if args.agent_factory
                 else {"agent_version": args.agent, "provider": args.provider, "model": args.model}
             )

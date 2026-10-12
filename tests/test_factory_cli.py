@@ -30,6 +30,7 @@ def test_cli_factory_failure_and_explicit_fixed_rerun(tmp_path, capsys):
     recorded = read_trace(path)
     assert recorded["agent"]["version"] == "example-v1-flawed"
     assert recorded["configuration"]["provider"] == "custom"
+    assert recorded["agent"]["factory_reference"] == FLAWED
     assert sum(r["amount_cents"] for r in recorded["final_state"]["refunds"]) == 600
     assert main(["rerun", str(path), "--agent-factory", CORRECTED, "--out", str(tmp_path)]) == 0
     fixed_output = json.loads(capsys.readouterr().out)
@@ -146,3 +147,30 @@ def test_conflicting_execution_options_fail_before_execution(tmp_path, capsys):
     )
     assert not (tmp_path / "out").exists()
     assert "omit" in capsys.readouterr().err
+
+
+def test_recorded_factory_is_never_automatically_imported(tmp_path, monkeypatch, capsys):
+    from agent_chaos.runner import run_scenario, write_json
+    from agent_chaos.schema import load_scenario
+
+    target = create_custom_agent(load_agent_factory(CORRECTED))
+    trace = run_scenario(
+        load_scenario("scenarios/01_normal.yaml"),
+        target.metadata["version"],
+        agent=target,
+        provider="custom",
+        out=tmp_path,
+    )
+    trace["agent"]["factory_reference"] = "recorded_untrusted_factory:make"
+    path = tmp_path / "recorded.json"
+    write_json(path, trace)
+    (tmp_path / "recorded_untrusted_factory.py").write_text(
+        "from pathlib import Path\nPath('imported').touch()\ndef make(): return object()\n"
+    )
+    monkeypatch.chdir(tmp_path)
+    assert main(["inspect", str(path)]) == 0
+    capsys.readouterr()
+    assert main(["rerun", str(path), "--out", "out"]) == 2
+    assert "--agent-factory" in capsys.readouterr().err
+    assert not Path("imported").exists()
+    assert not Path("out").exists()
