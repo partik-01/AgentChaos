@@ -38,6 +38,12 @@ intend to run. Inspection and export never import it.
 output to `Claim` objects, and routing all payment calls through `tools.call`.
 There is no automatic framework discovery or arbitrary API URL input.
 
+For a complete copyable implementation, open
+[`examples/custom_agent.py`](../examples/custom_agent.py). The contract snippets
+below illustrate the interface; `MyAgentAdapter.run_turn` with `...` is a stub,
+not a runnable target. Replace it with your application's tool dispatch and
+claim translation, or start by modifying the complete example.
+
 ## Run the independent example without an API key
 
 Install the project using the README quick start, then run from the repository:
@@ -164,8 +170,8 @@ agent-chaos rerun runs/custom/<run-id>/trace.json --provider scripted --agent co
 
 Custom targets can use `run`, `suite` and `rerun` with `--agent-factory`, the
 Python API, or their own runner. Generic CLI `compare`, `minimize`, and `study`
-do not load custom adapters. Run two matched-seed suites to compare custom versions. The
-website can display their recorded traces but cannot execute them. The example
+do not load custom adapters. Run two matched-seed suites to compare custom
+versions. The website can display their recorded traces but cannot execute them. The example
 and scenario files are repository assets, not bundled wheel contents.
 
 ## Repeated offline regression commands
@@ -186,3 +192,5 @@ passed 5/5 per policy; timeout, ambiguous retry, delayed visibility, repeat
 requests and malformed responses each failed 5/5 for the flawed policy. Both
 policies handled the changed amount. These are public development scenarios and
 deterministic scripted tests, not independent holdouts or live-model results.
+
+[Documentation index](README.md) · [Troubleshooting](TROUBLESHOOTING.md).
