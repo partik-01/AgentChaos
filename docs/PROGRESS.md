@@ -307,3 +307,13 @@ updated content. Screenshot: `runs/website-flow/workflow.jpg`. This is a static
 explanation, with no live model call or change to testing behavior. Public
 Vercel deployment remains pending authentication; this task updates the source
 and local website. No following feature was started.
+## Custom refund-agent adapter — in progress
+
+One task: formalize the Python target/tool boundary and provide a standalone
+offline adapter example that executes its own refund policy. Support explicitly
+supplied custom agents for runs and restored-state reruns. Never silently replace
+a custom target with a built-in agent. Record custom identity/version, keep full
+trace validation and financial verification, and demonstrate flawed failure plus
+corrected rerun. No arbitrary URL input, new workflow, or plugin code imported
+from traces. Document integration limits and run meaningful regression tests.
+Commit each small improvement and push the final work to GitHub.
