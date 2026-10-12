@@ -78,6 +78,11 @@ evidence are captured. Declare conversational text as `unassessed` unless it
 uses the exact supported deterministic templates. This is a small Python
 extension point, not broad framework interoperability or a stable plugin ABI.
 
+A [custom-agent integration guide](CUSTOM_AGENTS.md) now defines that boundary
+and provides an independent offline target, trial loop, and restored-state rerun.
+Custom traces require an explicit fresh adapter for execution; playback/export
+remain available through the generic CLI. No adapter code is loaded from traces.
+
 There is no real payment integration, hosted execution backend, production
 monitoring, or automatic fix generation. Connecting a production agent's existing
 tools requires deliberate adapter work and replacing payment operations with

@@ -307,7 +307,7 @@ updated content. Screenshot: `runs/website-flow/workflow.jpg`. This is a static
 explanation, with no live model call or change to testing behavior. Public
 Vercel deployment remains pending authentication; this task updates the source
 and local website. No following feature was started.
-## Custom refund-agent adapter — in progress
+## Custom refund-agent adapter — completed
 
 One task: formalize the Python target/tool boundary and provide a standalone
 offline adapter example that executes its own refund policy. Support explicitly
@@ -317,3 +317,26 @@ trace validation and financial verification, and demonstrate flawed failure plus
 corrected rerun. No arbitrary URL input, new workflow, or plugin code imported
 from traces. Document integration limits and run meaningful regression tests.
 Commit each small improvement and push the final work to GitHub.
+
+Sequential commits: `72aace2` scoped the work; `80afdcc` defined Python protocols,
+custom target configuration/version records and explicit adapter reruns;
+`7610983` added the independent no-key example plus scenario/rerun tests;
+`44d8653` added its trial loop and JSON/HTML summary output with fresh instances.
+The guide in [CUSTOM_AGENTS.md](CUSTOM_AGENTS.md) covers tool routing, metadata,
+claims, secret handling, bounded execution, replay versus rerun and CLI limits.
+
+Measured example suites: 25 failures / 40 flawed trials, 0 failures / 40 corrected
+trials; no harness errors or inconclusive runs. The normal and pre-execution
+failure cases each passed 5/5 for both policies. Five other cases each failed 5/5
+for the flawed target; both handled changed amounts. Failed timeout rerun again
+committed 600 cents; corrected restored-state rerun committed 300 cents. All 82
+initial review traces validated, and both documented 40-trial suite commands
+were executed successfully (flawed intentionally exits 1). Evidence remains
+under `runs/custom-adapter-review/`, `runs/custom-flawed/`, `runs/custom-corrected/`.
+
+Final verification: **204 Python tests and 17 JavaScript tests passed**. Lint,
+format and diff checks passed. The first format check caught Python snippets in
+the new Markdown guide; formatting them resolved it. No live model/API call or
+external adoption is claimed. This is a Python integration for the refund
+sandbox, not arbitrary endpoint or workflow support. No following feature was
+started.

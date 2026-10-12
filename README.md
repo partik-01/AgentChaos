@@ -16,6 +16,12 @@ website explains examples and views traces; it does not execute tests. No live
 model benchmark or external adoption is claimed. See [who can use it today,
 fresh-install evidence, and limits](docs/USABILITY.md).
 
+**Test your own refund agent:** implement the Python adapter boundary and route
+its payment tools through the simulator. A [runnable custom-agent example and
+integration guide](docs/CUSTOM_AGENTS.md) demonstrate a duplicate refund and a
+corrected restored-state rerun without an API key. Arbitrary API URLs and other
+workflows remain outside the current scope.
+
 ## Quick start (no API key)
 
 ```bash

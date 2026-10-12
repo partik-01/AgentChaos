@@ -52,6 +52,10 @@ These remain deterministic scripted demonstrations, not live model benchmarks.
 
 ## Workflow explainer website
 
+`custom_agent.py` is an independent Python target and runner for the refund
+sandbox. Follow [the custom-agent guide](../docs/CUSTOM_AGENTS.md) to reproduce
+its timeout failure and rerun the corrected policy. It needs no API key.
+
 Serve this folder with `python3 -m http.server 8765 --bind 127.0.0.1 --directory examples`
 from the repository root, then open `http://127.0.0.1:8765/`.
 `index.html` and `workflow.js` provide a six-step explanation, a flawed/corrected
