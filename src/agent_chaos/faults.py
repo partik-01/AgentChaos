@@ -14,7 +14,6 @@ from .schema import TOOL_MODELS, Fault
 class FaultMiddleware:
     def __init__(self, service: PaymentService, faults: list[Fault], seed: int):
         self.service = service
-        self.faults = faults
         self.counts: dict[str, int] = defaultdict(int)
         # Precompute decisions so agent-dependent extra calls cannot shift another fault's draw.
         rng = random.Random(seed)
