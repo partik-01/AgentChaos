@@ -18,6 +18,7 @@ from pydantic import (
     field_validator,
 )
 
+from .execution import apply_execution_stop
 from .schema import (
     TOOL_MODELS,
     Claim,
@@ -80,11 +81,30 @@ class Response(Record):
     tool_event_end: Count
 
 
+class ExecutionLimits(Record):
+    timeout_seconds: Annotated[float, Field(gt=0, allow_inf_nan=False)]
+    max_tool_calls: Annotated[StrictInt, Field(ge=1)]
+
+
+class BlockedCall(Record):
+    tool: Annotated[str, Field(min_length=1)]
+    arguments: JsonObject
+
+
+class ExecutionStop(Record):
+    kind: Literal["deadline", "tool_budget"]
+    phase: Literal["initialization", "agent"]
+    elapsed_ms: Duration
+    completed_tool_calls: Count
+    blocked_call: BlockedCall | None
+
+
 class Configuration(Record):
     provider: Literal["scripted", "openai", "custom"]
     agent_version: Annotated[str, Field(min_length=1)]
     model: str | None
     seed: StrictInt
+    execution_limits: ExecutionLimits | None = None
 
 
 class Usage(Record):
@@ -171,6 +191,7 @@ class Trace(Record):
     reproduction_command: Annotated[str, Field(min_length=1)]
     trial_summary: TrialSummary
     export_note: str | None = None
+    execution_stop: ExecutionStop | None = None
 
     @field_validator("created_at")
     @classmethod
@@ -502,6 +523,48 @@ def validate_trace(data: dict) -> dict:
         harness_error=result.get("error"),
         conversation_assessment=agent["conversation_assessment"],
     )
+    limits = config.get("execution_limits")
+    stop = data.get("execution_stop")
+    if limits:
+        require(
+            len(data["tool_events"]) <= limits["max_tool_calls"],
+            "execution_limits",
+            "tool budget exceeded in recorded events",
+        )
+    if stop:
+        require(bool(limits), "execution_stop", "missing recorded limits")
+        if stop["phase"] == "initialization":
+            require(
+                not data["tool_events"] and not data["responses"],
+                "execution_stop",
+                "initialization cannot have tool or response evidence",
+            )
+        require(
+            stop["completed_tool_calls"] == len(data["tool_events"]),
+            "execution_stop",
+            "call count must match tool evidence",
+        )
+        if stop["kind"] == "deadline":
+            require(
+                stop["elapsed_ms"] >= limits["timeout_seconds"] * 1000
+                and stop["blocked_call"] is None,
+                "execution_stop",
+                "invalid deadline evidence",
+            )
+        else:
+            require(
+                stop["phase"] == "agent"
+                and stop["blocked_call"] is not None
+                and stop["completed_tool_calls"] == limits["max_tool_calls"],
+                "execution_stop",
+                "invalid budget evidence",
+            )
+        require(
+            not any(v["rule"] == "agent_output_valid" for v in result["violations"]),
+            "execution_stop",
+            "conflicting output failure",
+        )
+        apply_execution_stop(expected, stop, limits, data["tool_events"])
     invalid_output = [v for v in result["violations"] if v["rule"] == "agent_output_valid"]
     if invalid_output:
         require(

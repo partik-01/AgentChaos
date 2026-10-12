@@ -2,10 +2,10 @@
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 
-from .adapters import create_custom_agent, load_agent_factory
 from .reports import write_html
 from .runner import read_trace, rerun, run_scenario, summarize, write_json
 from .schema import load_scenario
@@ -18,6 +18,26 @@ def positive(value):
     return number
 
 
+def positive_seconds(value):
+    number = float(value)
+    if not math.isfinite(number) or number <= 0:
+        raise argparse.ArgumentTypeError("must be finite and positive")
+    return number
+
+
+def limit_options(parser):
+    parser.add_argument(
+        "--timeout-seconds",
+        type=positive_seconds,
+        help="Per-run target deadline; custom factories default to 60",
+    )
+    parser.add_argument(
+        "--max-tool-calls",
+        type=positive,
+        help="Enforced per-run budget; custom factories default to 100",
+    )
+
+
 def execution_options(parser, *, custom=False):
     parser.add_argument("--agent", choices=["flawed", "corrected"], default="corrected")
     parser.add_argument("--provider", choices=["scripted", "openai"], default="scripted")
@@ -28,16 +48,18 @@ def execution_options(parser, *, custom=False):
         parser.add_argument(
             "--agent-factory", help="Explicit local module:callable returning a custom target"
         )
+        limit_options(parser)
 
 
-def custom_options(factory, reference):
-    target = create_custom_agent(factory)
-    target.metadata = dict(target.metadata, factory_reference=reference)
+def target_options(args):
+    factory = getattr(args, "agent_factory", None)
     return {
-        "agent": target,
-        "agent_version": target.metadata["version"],
-        "provider": "custom",
-        "model": target.metadata.get("model"),
+        "agent_factory": factory,
+        "agent_version": "uninitialized" if factory else args.agent,
+        "provider": "custom" if factory else args.provider,
+        "model": None if factory else args.model,
+        "timeout_seconds": getattr(args, "timeout_seconds", None),
+        "max_tool_calls": getattr(args, "max_tool_calls", None),
     }
 
 
@@ -52,18 +74,13 @@ def suite_paths(path):
 def execute_suite(args, agent):
     # Validate all fixtures before any model spending.
     scenarios = [load_scenario(p) for p in suite_paths(args.path)]
-    factory = (
-        load_agent_factory(args.agent_factory) if getattr(args, "agent_factory", None) else None
-    )
     traces = []
     for scenario in scenarios:
         for trial in range(args.trials):
             seed = (args.seed if args.seed is not None else scenario.seed) + trial
-            options = (
-                custom_options(factory, args.agent_factory)
-                if factory
-                else {"agent_version": agent, "provider": args.provider, "model": args.model}
-            )
+            options = target_options(args)
+            if options["agent_factory"] is None:
+                options["agent_version"] = agent
             trace = run_scenario(
                 scenario.model_copy(update={"seed": seed}), out=args.out, **options
             )
@@ -114,6 +131,7 @@ def main(argv=None):
     repeat.add_argument(
         "--agent-factory", help="Explicit local module:callable for a fresh custom target"
     )
+    limit_options(repeat)
     compare = commands.add_parser(
         "compare", help="Matched fault-seed trials for both agent versions"
     )
@@ -221,11 +239,7 @@ def main(argv=None):
             scenario = load_scenario(args.scenario)
             if args.seed is not None:
                 scenario = scenario.model_copy(update={"seed": args.seed})
-            options = (
-                custom_options(load_agent_factory(args.agent_factory), args.agent_factory)
-                if args.agent_factory
-                else {"agent_version": args.agent, "provider": args.provider, "model": args.model}
-            )
+            options = target_options(args)
             trace = run_scenario(scenario, out=args.out, **options)
             print(
                 json.dumps(
@@ -268,11 +282,7 @@ def main(argv=None):
             return exit_code(right["summary"])
         if args.command == "rerun":
             recorded = read_trace(args.trace)  # Validate before importing user-selected code.
-            options = (
-                custom_options(load_agent_factory(args.agent_factory), args.agent_factory)
-                if args.agent_factory
-                else {"agent_version": args.agent, "provider": args.provider, "model": args.model}
-            )
+            options = target_options(args)
             trace = rerun(
                 recorded,
                 out=args.out,

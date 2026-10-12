@@ -444,3 +444,13 @@ stop evidence during playback/rerun, and document process/metadata limitations.
 Test hangs, swallowed limits, committed-before-hang refunds, boundary budgets,
 worker cleanup, suite continuation and legacy behavior. Commit small increments,
 run full checks and reproducible offline examples, then push to GitHub.
+
+Implementation checkpoint: spawned targets with parent-owned tools/ledger,
+default limits on factories and opt-in limits on existing built-ins/Python
+instances. Reruns retain recorded budgets, stopped traces validate their evidence,
+and factory setup failures are recorded per trial. Added two no-key stop examples
+and 35 focused tests covering commit retention, faulted attempts, exact budgets,
+initialization/import hangs, worker crashes/cleanup, suite continuation, tampering,
+legacy traces, and provider setup failures. Focused tests and lint pass; the full
+suite passed 276 tests before the final provider-rerun regression test was added.
+Documentation/report polish and final verification remain within this task.

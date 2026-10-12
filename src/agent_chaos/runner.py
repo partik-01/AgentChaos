@@ -12,6 +12,7 @@ from pathlib import Path
 from . import __version__
 from .adapters import RefundAgent
 from .agents import AgentFailure, ScriptedAgent
+from .execution import apply_execution_stop, execute_bounded, execution_limits
 from .faults import FaultMiddleware
 from .payments import PaymentService
 from .schema import Scenario
@@ -38,8 +39,20 @@ def run_scenario(
     provider="scripted",
     model: str | None = None,
     agent: RefundAgent | None = None,
+    agent_factory: str | None = None,
+    timeout_seconds: float | None = None,
+    max_tool_calls: int | None = None,
     parent_run: str | None = None,
 ) -> dict:
+    if agent is not None and agent_factory is not None:
+        raise ValueError("supply an agent instance or agent_factory, not both")
+    limits = (
+        execution_limits(timeout_seconds, max_tool_calls)
+        if (agent_factory is not None or timeout_seconds is not None or max_tool_calls is not None)
+        else None
+    )
+    if agent_factory:
+        provider = "custom"
     start = time.perf_counter()
     run_id = uuid.uuid4().hex[:16]
     directory = Path(out).resolve() / run_id
@@ -52,6 +65,7 @@ def run_scenario(
     responses = []
     error = None
     agent_error = None
+    execution_stop = None
     metadata = {
         "kind": provider,
         "version": agent_version,
@@ -60,30 +74,62 @@ def run_scenario(
         "cost_usd": None,
         "conversation_assessment": "unassessed",
     }
-    try:
-        if agent is None:
-            if provider == "scripted":
-                agent = ScriptedAgent(agent_version)
-            elif provider == "openai":
-                from .openai_agent import OpenAIAgent
+    if limits is not None:
+        if agent is not None:
+            metadata = agent.metadata
+        if provider == "scripted" and agent is None:
+            metadata = ScriptedAgent(agent_version).metadata
+        if agent_factory:
+            metadata["factory_reference"] = agent_factory
+        outcome = execute_bounded(
+            scenario,
+            middleware,
+            metadata,
+            limits,
+            provider=provider,
+            version=agent_version,
+            model=model,
+            agent=agent,
+            factory=agent_factory,
+        )
+        metadata = outcome["metadata"]
+        responses = outcome["responses"]
+        error, agent_error = outcome["error"], outcome["agent_error"]
+        execution_stop = outcome["stop"]
+        if agent_factory and metadata.get("version"):
+            agent_version = metadata["version"]
+            model = metadata.get("model")
+        metadata = dict(
+            metadata,
+            execution_metadata_complete=execution_stop is None
+            and error is None
+            and agent_error is None,
+        )
+    else:
+        try:
+            if agent is None:
+                if provider == "scripted":
+                    agent = ScriptedAgent(agent_version)
+                elif provider == "openai":
+                    from .openai_agent import OpenAIAgent
 
-                agent = OpenAIAgent(agent_version, model)
-            else:
-                raise ValueError(f"unknown provider: {provider}")
-        metadata = agent.metadata
-        for index, turn in enumerate(scenario.turns):
-            claims = agent.run_turn(turn, middleware)
-            responses.append(
-                {
-                    "turn": index,
-                    "claims": [c.model_dump() for c in claims],
-                    "tool_event_end": len(middleware.events),
-                }
-            )
-    except AgentFailure as exc:
-        agent_error = str(exc)
-    except Exception as exc:
-        error = f"{type(exc).__name__}: {exc}"
+                    agent = OpenAIAgent(agent_version, model)
+                else:
+                    raise ValueError(f"unknown provider: {provider}")
+            metadata = agent.metadata
+            for index, turn in enumerate(scenario.turns):
+                claims = agent.run_turn(turn, middleware)
+                responses.append(
+                    {
+                        "turn": index,
+                        "claims": [c.model_dump() for c in claims],
+                        "tool_event_end": len(middleware.events),
+                    }
+                )
+        except AgentFailure as exc:
+            agent_error = str(exc)
+        except Exception as exc:
+            error = f"{type(exc).__name__}: {exc}"
     final = service.snapshot()
     service.close()
     result = verify(
@@ -111,6 +157,7 @@ def run_scenario(
             "evidence": [],
             "uncertainty": "invalid agent response",
         }
+    apply_execution_stop(result, execution_stop, limits, middleware.events)
     scenario_data = scenario.model_dump()
     trace = {
         "trace_version": TRACE_VERSION,
@@ -145,6 +192,9 @@ def run_scenario(
             "failure_count": int(result["status"] == "agent_failure"),
         },
     }
+    if limits is not None:
+        trace["configuration"]["execution_limits"] = limits
+        trace["execution_stop"] = execution_stop
     # Reports also embed evidence. A failed write raises a CLI harness error, never prints a pass.
     write_json(directory / "trace.json", trace)
     from .reports import write_html
@@ -187,11 +237,18 @@ def rerun(
     provider=None,
     model=None,
     agent: RefundAgent | None = None,
+    agent_factory: str | None = None,
+    timeout_seconds: float | None = None,
+    max_tool_calls: int | None = None,
 ) -> dict:
     validate_trace(trace)
     config = trace["configuration"]
-    custom = config["provider"] == "custom" or trace["agent"].get("kind") not in ("scripted", "llm")
-    if custom and agent is None and provider is None:
+    custom = config["provider"] == "custom" or trace["agent"].get("kind") not in (
+        "scripted",
+        "llm",
+        "openai",
+    )
+    if custom and agent is None and agent_factory is None and provider is None:
         raise ValueError(
             "Custom-agent reruns require a fresh agent instance via Python rerun(..., agent=...). "
             "Use CLI --agent-factory module:callable or the adapter's runner; "
@@ -206,6 +263,13 @@ def rerun(
         provider=provider or config["provider"],
         model=model or config.get("model"),
         agent=agent,
+        agent_factory=agent_factory,
+        timeout_seconds=timeout_seconds
+        if timeout_seconds is not None
+        else (config.get("execution_limits") or {}).get("timeout_seconds"),
+        max_tool_calls=max_tool_calls
+        if max_tool_calls is not None
+        else (config.get("execution_limits") or {}).get("max_tool_calls"),
         parent_run=trace["run_id"],
     )
 
