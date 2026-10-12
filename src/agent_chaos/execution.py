@@ -154,9 +154,23 @@ def execute_bounded(
                     )
                 continue
             message = receive(parent)
-            if message.get("metadata") is not None:
-                outcome["metadata"] = message["metadata"]
             kind = message["type"]
+            if message.get("metadata") is not None and not (
+                kind in ("error", "agent_error") and not ready
+            ):
+                # A rejected constructor may return malformed metadata. Keep
+                # the last valid identity so its harness-error trace is usable.
+                from .traces import AgentMetadata
+
+                candidate = message["metadata"]
+                AgentMetadata.model_validate(candidate, strict=True)
+                if factory and (
+                    candidate.get("kind") != "custom"
+                    or not isinstance(candidate.get("version"), str)
+                    or not candidate["version"].strip()
+                ):
+                    raise ValueError("worker supplied invalid custom target identity")
+                outcome["metadata"] = candidate
             if kind == "ready":
                 ready = True
             elif kind == "tool":

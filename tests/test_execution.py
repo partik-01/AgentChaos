@@ -205,6 +205,28 @@ def test_initialization_deadline_and_exception_are_harness_errors(tmp_path, monk
             assert "broken setup" in trace["result"]["error"]
 
 
+def test_invalid_factory_metadata_produces_readable_harness_trace(tmp_path, monkeypatch):
+    fixture = scenario()
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "bad_metadata_factory.py").write_text(
+        "class Target:\n"
+        "    metadata = {'kind': 'custom', 'version': 3}\n"
+        "    def run_turn(self, turn, tools): return []\n"
+        "def make(): return Target()\n"
+    )
+    trace = saved(
+        run_scenario(
+            fixture,
+            agent_factory="bad_metadata_factory:make",
+            out=tmp_path,
+        ),
+        tmp_path,
+    )
+    assert trace["result"]["status"] == "harness_error"
+    assert trace["final_state"] == trace["initial_state"]
+    assert "nonempty version" in trace["result"]["error"]
+
+
 def test_worker_crash_retains_backend_evidence(tmp_path):
     trace = saved(
         run_scenario(

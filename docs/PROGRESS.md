@@ -458,3 +458,8 @@ Documentation/report polish and final verification remain within this task.
 Minor report improvement: bounded HTML reports now include a dedicated limits
 and stop-evidence section, including setup-time stops. Focused saved-trace tests
 check its presence; normal report structure stays compatible.
+
+Review correction: rejected factory metadata must not overwrite the parent's
+valid fallback identity. Validate received metadata and retain the last valid
+identity on setup errors, so malformed constructors still yield inspectable
+harness-error evidence rather than an invalid saved trace.
