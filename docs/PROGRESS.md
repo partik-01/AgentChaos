@@ -369,3 +369,13 @@ This removes a separate custom runner and suite loop, not the need to bridge a
 different framework's tools/output to the refund boundary. No live model calls,
 automatic framework discovery, HTTP integration, or new workflow is claimed.
 The task is complete; no following improvement was started.
+## Configurable tool-call rules — in progress
+
+One task: optional YAML call-order, maximum-call and consistent-retry-argument
+rules. Define exact semantics first in [TOOL_RULES.md](TOOL_RULES.md). Validate
+configuration before execution, check attempted calls deterministically, report
+rule IDs/expected/observed/event references, preserve financial checks and error
+precedence, recheck policies during playback/rerun, and keep old traces readable.
+Add a separate sample (without altering historical benchmark scenarios), test
+rules independently and through custom CLI targets, document measured evidence,
+commit small improvements sequentially, then push to GitHub.
