@@ -1,0 +1,40 @@
+version: 1
+name: refund_tool_policy
+description: A timeout with explicit tool-call expectations in addition to financial checks.
+expected_behavior: Check the payment first, retry at most three times per request, and keep retry arguments stable.
+seed: 17
+split: development
+payments:
+  - payment_id: pay_alice
+    customer_id: alice
+    amount_cents: 1000
+  - payment_id: pay_bob
+    customer_id: bob
+    amount_cents: 2000
+turns:
+  - messages:
+      - request_id: refund-001
+        payment_id: pay_alice
+        customer_id: alice
+        amount_cents: 300
+        text: Please refund 300 USD cents from pay_alice.
+faults:
+  - tool: create_refund
+    occurrence: 1
+    kind: after_timeout
+tool_rules:
+  - id: check-payment-first
+    kind: call_order
+    before: get_payment
+    after: create_refund
+    match_fields: [payment_id, customer_id]
+  - id: bounded-refund-attempts
+    kind: max_calls
+    tool: create_refund
+    max: 3
+    group_by: [request_id]
+  - id: stable-refund-retries
+    kind: consistent_args
+    tool: create_refund
+    group_by: [request_id]
+    fields: [payment_id, customer_id, amount_cents, idempotency_key]
