@@ -433,7 +433,7 @@ All checked relative documentation links resolved. Final local regression check:
 Windows commands and remote CI were not verified. No live-model calls, external
 adoption or public deployment are claimed. Runtime behavior is unchanged; no
 following feature was started.
-## Enforced target execution limits — in progress
+## Enforced target execution limits — completed
 
 One task: parent-owned payment/trace evidence with a spawned target worker,
 wall-clock deadline and tool-call budget. Define the contract in
@@ -463,3 +463,29 @@ Review correction: rejected factory metadata must not overwrite the parent's
 valid fallback identity. Validate received metadata and retain the last valid
 identity on setup errors, so malformed constructors still yield inspectable
 harness-error evidence rather than an invalid saved trace.
+
+Final documentation: [execution-limit guide](EXECUTION_LIMITS.md), CLI options,
+README defaults, custom-agent process requirements, troubleshooting, trace
+validation and usability boundaries. Existing direct Python/built-in calls stay
+inline unless a limit is supplied; factory calls are bounded by default.
+Parent serialization/tools and report finalization are not forcibly interrupted;
+no memory/cost cap, security sandbox or provider cancellation guarantee is claimed.
+
+Local final checks: **278 Python tests and 17 JavaScript tests passed**;
+lint, formatting and diff checks passed; all 104 checked relative Markdown links
+resolved. No-key CLI verification produced 58 fully validated runs: 49 passes,
+7 intentional agent limit failures, 2 setup harness errors, 0 inconclusive.
+The 24 bounded core trials matched 24 normal trials in verdict, ledger and fault
+schedule. Three deadline trials retained the committed 300-cent refund, three
+budget trials stopped before the fourth read, a deadline rerun failed again,
+and a corrected rerun passed with one refund. Setup failure suites continued.
+Inspection and JSON/HTML export were checked. Local evidence:
+`runs/execution-limits-validation/validation.json` (ignored run output).
+The verification helper initially expected JSON stdout from the silent export
+command; the exported files and all run evidence passed independent validation.
+
+Commit checkpoints: `5893bc9` contract, `08c0448` execution/CLI/trace integration,
+`abeec92` report section, `ff0d45c` malformed factory metadata retention; final
+documentation/validation follows as a separate commit. Validation used
+macOS/Python 3.12 and scripted agents; no live-model benchmark, remote CI or
+Linux/Windows execution is claimed. No following task was started.

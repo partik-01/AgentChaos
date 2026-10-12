@@ -23,6 +23,7 @@ OpenAI integration, and explicit loading of your own Python agent factory.
 | Real SQLite executions and independent financial verification | Simulated refunds; no real money or payment credentials |
 | Five fault types, versioned YAML scenarios and seeded scheduling | Seeds control faults, not live model output |
 | Custom agent loading with `--agent-factory` | Your tools/output must follow the refund interface |
+| Enforced deadlines and tool budgets for custom factories | Process isolation; no security sandbox or spending cap |
 | Configurable call order, attempt limits and retry arguments | Four refund tools; no arbitrary API/workflow testing |
 | JSON/HTML reports and a local trace viewer | Website displays evidence; CLI executes tests |
 
@@ -87,6 +88,13 @@ may need a small bridge to route tools and translate responses. The
 [integration guide](docs/CUSTOM_AGENTS.md) defines the contract, shows the runnable
 example, and explains custom reruns. Adapter code is never loaded automatically
 from a trace.
+
+Custom factories default to **60 seconds and 100 tool calls per scenario run**.
+Use `--timeout-seconds` and `--max-tool-calls` on `run`, `suite` or `rerun` to
+set your budgets. Stops retain committed refunds and evidence; setup failures
+never count as passes. [Execution-limit guide](docs/EXECUTION_LIMITS.md) includes
+no-key hang/retry demonstrations and Python process requirements. Existing
+built-in/direct Python runs stay inline unless limits are supplied.
 
 ## Write a scenario or tool policy
 

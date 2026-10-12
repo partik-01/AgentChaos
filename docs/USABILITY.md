@@ -85,6 +85,14 @@ and provides an independent offline target, trial loop, and restored-state rerun
 Custom traces require an explicit factory or fresh adapter for execution; playback/export
 remain available through the generic CLI. No adapter code is loaded from traces.
 
+CLI factories run with enforced 60-second / 100-call defaults. An initialized
+target exceeding limits produces an agent failure; setup failures/crashes
+produce harness errors, and suites continue. Parent-owned tools retain completed
+refunds even if the target hangs. Built-ins and direct Python instances need
+explicit limits to opt in. This is termination isolation, not a security sandbox,
+memory/cost cap or guaranteed external-request cancellation. See
+[execution limits](EXECUTION_LIMITS.md) for commands and precise boundaries.
+
 There is no real payment integration, hosted execution backend, production
 monitoring, or automatic fix generation. Connecting a production agent's existing
 tools requires deliberate adapter work and replacing payment operations with

@@ -34,6 +34,8 @@ not suite/comparison bundles.
 | `--provider scripted` | Default; no model API calls |
 | `--provider openai --model YOUR_MODEL_ID` | Optional live integration; needs extra/key |
 | `--agent-factory module:callable` | Explicit custom target for run, suite and rerun |
+| `--timeout-seconds NUMBER` | Target deadline for run/suite/rerun; factory default 60 seconds |
+| `--max-tool-calls INTEGER` | Enforced budget for run/suite/rerun; factory default 100 |
 | `--out DIRECTORY` | Evidence root, default `runs` |
 | `--seed INTEGER` | Override fault seed for run, suite, compare and study |
 | `--trials INTEGER` | Trials per scenario for suite/compare, default 3 |
@@ -41,6 +43,12 @@ not suite/comparison bundles.
 Suite seeds are the scenario/override seed plus trial index, starting at zero.
 Comparisons use matching seeds for both built-in versions. Discovery selects
 immediate `*.yaml` files, not nested folders. Each trial has fresh state.
+
+Factories always use both limits. Built-ins and direct Python instances retain
+inline behavior unless a limit is supplied. Reruns retain recorded limits; either
+flag overrides just that value. These flags are not available on `compare`,
+`generate`, `minimize` or `study`. See [execution limits](EXECUTION_LIMITS.md) for
+stop demonstrations, classification and process requirements.
 
 Rerun defaults to the recorded provider/version/model and restores the initial
 database and scenario seed. It has no `--seed` override. Custom targets require

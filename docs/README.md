@@ -10,6 +10,7 @@ scenario, and inspect its evidence. No model API key is needed for that path.
 | Create a refund/fault test case | [Scenario authoring](SCENARIOS.md) |
 | Connect an existing Python agent | [Custom agents](CUSTOM_AGENTS.md) |
 | Require tool order, bounded calls or stable retry arguments | [Tool rules](TOOL_RULES.md) |
+| Stop hung targets or endless tool loops | [Execution limits](EXECUTION_LIMITS.md) |
 | Understand payment/idempotency/fault semantics | [API contract](API.md) |
 | Understand offline evidence validation | [Trace validation](TRACE_VALIDATION.md) |
 | Fix a setup, integration or result problem | [Troubleshooting](TROUBLESHOOTING.md) |
@@ -31,6 +32,7 @@ repository; the wheel contains the Python package, not those assets.
 | `faults.py` | Seeded faults and separate backend/observed events |
 | `agents.py`, `openai_agent.py` | Scripted targets and optional OpenAI target |
 | `adapters.py` | Python target/tool boundary and explicit factory loading |
+| `execution.py` | Spawned target, enforced deadline/budget and stop evidence |
 | `tool_rules.py`, `verifier.py` | Independent policy, financial and claim checks |
 | `runner.py`, `traces.py` | Isolated executions, restoration and trace validation |
 | `cli.py`, `reports.py` | Commands, trial summaries and JSON/static HTML output |

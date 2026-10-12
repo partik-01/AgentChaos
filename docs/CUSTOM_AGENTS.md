@@ -21,8 +21,10 @@ Replace `examples.custom_agent:make_corrected_agent` with `my_agent:create_agent
 for your own importable module. Modules can be in the current working directory
 or installed in the active Python environment. A class with a zero-argument
 constructor also works. The factory must return a **new instance on every call**;
-the suite calls it once per trial. Constructor failures and invalid metadata exit
-2, never pass. The factory must provide `kind: custom`, a nonempty `version`, and
+the suite calls it once per trial in a fresh spawned worker. Constructor failures
+and invalid metadata are recorded as harness errors (exit 2); suites continue.
+Factories default to 60 seconds and 100 tool calls per run. Override with
+`--timeout-seconds` and `--max-tool-calls`; see [execution limits](EXECUTION_LIMITS.md). The factory must provide `kind: custom`, a nonempty `version`, and
 `conversation_assessment` (`unassessed` or `deterministic_templates`), with
 JSON-compatible trace metadata and a callable `run_turn`.
 
@@ -114,9 +116,12 @@ the network.
 Return a list of Pydantic `Claim` objects with request, payment, customer, amount,
 status and actual customer-facing text. Use `AgentFailure` for invalid agent
 output or an exhausted application step budget. Unexpected adapter exceptions
-are harness errors; they never count as passes. Bound your own retries, model
-steps and timeouts; the synchronous Python runner does not forcibly terminate a
-hung custom adapter.
+are harness errors; they never count as passes. Keep bounded retries, model
+steps and network timeouts in your target. CLI factories have parent-enforced
+execution limits. Direct Python `agent=...` runs and the standalone runner below
+remain inline unless `timeout_seconds` or `max_tool_calls` is provided. Prefer
+`agent_factory="module:callable"` to bound import/construction too; see
+[execution limits](EXECUTION_LIMITS.md).
 
 For arbitrary model prose, keep `conversation_assessment: unassessed`. Financial
 and structured claim checks still execute, but otherwise-correct runs remain

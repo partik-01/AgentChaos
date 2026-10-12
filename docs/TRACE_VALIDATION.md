@@ -97,3 +97,12 @@ is authentic. There is no signature or trusted external ledger. Changing all
 related fields coherently can evade consistency checks. No live model calls were
 made. Future changes to API or fault semantics must preserve the version-1 import
 contract or introduce an explicit new trace version.
+
+## Optional execution-stop evidence
+
+Bounded version-1 traces add `configuration.execution_limits` and
+`execution_stop`. Validation checks completed-call counts, budgets, deadline
+elapsed time, blocked-call presence, initialization evidence and the recomputed
+stop verdict. A blocked call was never executed, so it is separate from tool
+events. Older traces without these fields remain compatible. See
+[execution limits](EXECUTION_LIMITS.md) for semantics and enforcement boundaries.

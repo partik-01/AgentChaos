@@ -17,7 +17,9 @@ stderr; [CLI result meanings](CLI.md) explain `0`, `1`, `2` and `3`.
 | Factory import fails | Use `module:callable` in the current directory or installed environment. Factory must take no arguments. |
 | Factory target rejected | Check custom kind, nonempty version, JSON metadata, conversation assessment and callable `run_turn`. |
 | Custom rerun refuses | Explicitly supply `--agent-factory` again; trace metadata is never auto-imported. |
-| Custom agent hangs | Bound model steps, retries and network timeouts in the target. The runner cannot forcibly stop arbitrary target code. |
+| Custom agent hangs | CLI factories default to 60 seconds / 100 calls. Set `--timeout-seconds` / `--max-tool-calls`. Direct Python runs need explicit limits or a factory; see [execution limits](EXECUTION_LIMITS.md). |
+| Spawn/pickle error | Prefer an importable zero-argument factory. Use a main guard in Python entrypoints; local classes/lambdas and parent monkeypatches do not transfer reliably. |
+| Initialization deadline | Inspect `execution_stop.phase`; startup/import/construction counts against the deadline. Increase it to test agent behavior rather than startup. |
 | OpenAI unavailable | Install `.[openai]`, set `OPENAI_API_KEY` in the environment and pass your available `--model`. `.env` is not automatically loaded. |
 | Viewer rejects JSON | Choose a single-run trace, not a suite summary; maximum 10 MiB. Use CLI inspect for full validation. |
 | Report missing | Look under `--out/RUN_ID/report.html`. Output-write failures return errors, never a pass. |
