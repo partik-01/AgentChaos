@@ -78,6 +78,16 @@ def render_html(data: dict) -> str:
     result = data["result"] if is_run else data.get("summary", data)
     sections = [("Outcome", result)]
     if is_run:
+        if data["configuration"].get("execution_limits"):
+            sections.append(
+                (
+                    "Execution limits and stop evidence",
+                    {
+                        "limits": data["configuration"]["execution_limits"],
+                        "stop": data.get("execution_stop"),
+                    },
+                )
+            )
         sections += [
             ("Failure count / total trials", data["trial_summary"]),
             ("Reproduce by scenario rerun", data["reproduction_command"]),

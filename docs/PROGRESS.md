@@ -454,3 +454,7 @@ initialization/import hangs, worker crashes/cleanup, suite continuation, tamperi
 legacy traces, and provider setup failures. Focused tests and lint pass; the full
 suite passed 276 tests before the final provider-rerun regression test was added.
 Documentation/report polish and final verification remain within this task.
+
+Minor report improvement: bounded HTML reports now include a dedicated limits
+and stop-evidence section, including setup-time stops. Focused saved-trace tests
+check its presence; normal report structure stays compatible.

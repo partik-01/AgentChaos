@@ -40,7 +40,12 @@ def scenario():
 
 def saved(trace, directory):
     assert read_trace(directory / trace["run_id"]) == trace
-    assert (directory / trace["run_id"] / "report.html").is_file()
+    report = directory / trace["run_id"] / "report.html"
+    assert report.is_file()
+    if trace["configuration"].get("execution_limits"):
+        assert "Execution limits and stop evidence" in report.read_text()
+        if trace.get("execution_stop"):
+            assert trace["execution_stop"]["kind"] in report.read_text()
     return trace
 
 
