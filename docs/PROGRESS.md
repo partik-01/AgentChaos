@@ -433,3 +433,14 @@ All checked relative documentation links resolved. Final local regression check:
 Windows commands and remote CI were not verified. No live-model calls, external
 adoption or public deployment are claimed. Runtime behavior is unchanged; no
 following feature was started.
+## Enforced target execution limits — in progress
+
+One task: parent-owned payment/trace evidence with a spawned target worker,
+wall-clock deadline and tool-call budget. Define the contract in
+[EXECUTION_LIMITS.md](EXECUTION_LIMITS.md) before coding. Apply defaults to custom
+factories, preserve existing unbounded direct Python calls, protect initialization
+and execution, distinguish setup/crashes from target limit failures, validate
+stop evidence during playback/rerun, and document process/metadata limitations.
+Test hangs, swallowed limits, committed-before-hang refunds, boundary budgets,
+worker cleanup, suite continuation and legacy behavior. Commit small increments,
+run full checks and reproducible offline examples, then push to GitHub.
