@@ -1,271 +1,160 @@
 # Agent Chaos
 
-**Find out what an agent actually did when its tools failed.** Agent Chaos tests a
-customer-support refund workflow against a simulated SQLite payment ledger. It
-injects precisely timed faults, independently verifies the business outcome, and
-saves enough evidence to inspect a failure and rerun it against another agent.
+**Test what your agent actually does when its tools fail.**
 
-MIT licensed. Python 3.11+. **Simulated payments only.** No real payment credentials
-or payment network access. The default agents are deterministic Python scripts;
-the optional OpenAI adapter runs a real tool-calling model.
+Agent Chaos runs refund agents against a simulated SQLite payment service,
+injects faults, and checks the resulting business outcome independently. A
+successful-looking reply can still hide a duplicate refund; the report shows
+both what the agent saw and what the backend committed.
 
-**Current usefulness:** a working refund-testing sandbox for developers, with
-real SQLite executions and failure evidence. It is early-stage, limited to this
-simulated workflow, and requires an adapter for an existing external agent. The
-website explains examples and views traces; it does not execute tests. No live
-model benchmark or external adoption is claimed. See [who can use it today,
-fresh-install evidence, and limits](docs/USABILITY.md).
+**Early developer toolkit · Python 3.11+ · MIT · Simulated payments only**
 
-**Test your own refund agent:** implement the Python adapter boundary and route
-its payment tools through the simulator. A [runnable custom-agent example and
-integration guide](docs/CUSTOM_AGENTS.md) demonstrate a duplicate refund and a
-corrected restored-state rerun without an API key. Arbitrary API URLs and other
-workflows remain outside the current scope.
+[Get started](docs/GETTING_STARTED.md) · [Documentation](docs/README.md) ·
+[Connect your agent](docs/CUSTOM_AGENTS.md) · [Contribute](CONTRIBUTING.md)
 
-You can load a compatible custom target directly with the standard CLI:
+## Is this for you?
 
-```bash
-agent-chaos run scenarios/03_after_timeout.yaml --agent-factory examples.custom_agent:make_flawed_agent
-agent-chaos suite scenarios --agent-factory examples.custom_agent:make_corrected_agent --trials 5
-agent-chaos rerun runs/<run-id>/trace.json --agent-factory examples.custom_agent:make_corrected_agent
-```
+Use it to test refund retry logic, idempotency, recovery from ambiguous failures,
+and tool-call policies. It includes flawed and corrected scripts, an optional
+OpenAI integration, and explicit loading of your own Python agent factory.
 
-Replace the factory with your own `my_agent:create_agent`. This removes a separate
-runner script; different framework interfaces still need tool routing and claim
-translation. Factories create a fresh target per trial and are never loaded
-automatically from recorded traces.
+| Available today | Boundary |
+| --- | --- |
+| Real SQLite executions and independent financial verification | Simulated refunds; no real money or payment credentials |
+| Five fault types, versioned YAML scenarios and seeded scheduling | Seeds control faults, not live model output |
+| Custom agent loading with `--agent-factory` | Your tools/output must follow the refund interface |
+| Configurable call order, attempt limits and retry arguments | Four refund tools; no arbitrary API/workflow testing |
+| JSON/HTML reports and a local trace viewer | Website displays evidence; CLI executes tests |
 
-**Choose your own tool-call requirements in YAML:** require a payment lookup
-before refund creation, cap attempts per request, and keep retry arguments stable.
-These deterministic rules complement the financial verifier and report the exact
-violating events. See [tool-rule semantics and runnable examples](docs/TOOL_RULES.md).
+No API key is needed for the examples below. No live-model benchmark or
+independent external adoption is claimed. See [current usability and
+limitations](docs/USABILITY.md).
 
-## Quick start (no API key)
+## First run
+
+You need Git and Python 3.11 or newer. Run these in a terminal on macOS/Linux;
+[Windows instructions and setup troubleshooting](docs/GETTING_STARTED.md) are
+also available. Node is only needed for the website's JavaScript tests.
 
 ```bash
 git clone https://github.com/partik-01/ChaoticAgent.git
 cd ChaoticAgent
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -e '.[dev]'
-pytest -q
+python -m pip install -e .
 agent-chaos run scenarios/01_normal.yaml
-agent-chaos run scenarios/03_after_timeout.yaml --agent flawed
-# The previous command intentionally exits 1: it exposes a duplicate refund.
-agent-chaos compare scenarios --trials 5 --out runs/comparison
 ```
 
-Every run saves `trace.json`, `report.html`, and `payments.sqlite` in an isolated
-`runs/<run-id>/` directory. The CLI prints the exact reproduction command. Open
-the HTML file directly in a browser. Suite and comparison commands also export
-JSON and HTML containing all trial evidence and counts per scenario.
+Expected: `"status": "pass"` and exit code `0`. Copy the printed `run_id` to
+find `runs/RUN_ID/trace.json`, `report.html`, and `payments.sqlite`. `RUN_ID` means
+the generated identifier, not a literal directory name. Open `report.html`
+directly in a browser to see the evidence.
+
+## Expose a failure, then check the correction
+
+These commands use a checked-in trace, so no path editing or API key is needed:
 
 ```bash
-agent-chaos inspect runs/<run-id>/trace.json
-agent-chaos playback runs/<run-id>/trace.json   # Read-only, offline inspection
-agent-chaos rerun runs/<run-id>/trace.json      # Executes again from saved initial state
-agent-chaos rerun runs/<run-id>/trace.json --agent corrected
-agent-chaos export runs/<run-id>/trace.json --output failure.json
-agent-chaos suite scenarios --agent corrected --trials 10 --out runs/suite
-agent-chaos compare scenarios/heldout --trials 5 --out runs/holdout
+agent-chaos inspect examples/timeout-flawed.json
+agent-chaos rerun examples/timeout-flawed.json
+# Expected exit 1: the flawed agent refunds 600 cents instead of 300.
+agent-chaos rerun examples/timeout-flawed.json --agent corrected
+# Expected exit 0: the restored-state rerun refunds exactly 300 cents.
 ```
 
-Exit codes: `0` pass (or successful inspection/export); `1` agent failure;
-`2` harness error; `3` inconclusive. Comparison ignores intentional flawed-agent
-failures, but harness errors in either agent exit `2`; inconclusive flawed-agent
-trials cannot produce a successful comparison. CLI usage errors exit `2`. A broken
-provider or invalid scenario can never count as a pass.
+The first creation succeeds, but its response times out. The flawed agent
+retries with a new idempotency key and commits a second refund. The verifier
+reports `exact_total_refunded` and `no_duplicate_economic_effect`, with the
+fault, calls and committed rows as evidence. The corrected policy confirms the
+original refund or retries with its original key.
 
-Recorded single-run traces are validated before `inspect`/`playback`, `export`,
-`minimize`, and `rerun`, including direct Python reruns. Checks cover required
-fields and strict types, the scenario hash, seeded faults, event references,
-authoritative ledger effects, response timing, model usage, and the recorded
-verdict. Invalid evidence exits `2` before execution or output creation; valid
-agent failures and partial harness errors remain inspectable. Validation is
-offline and preserves the original evidence. It checks consistency, not
-authenticity. See [the trace contract](docs/TRACE_VALIDATION.md).
+**Inspection** reads recorded evidence without executing tools. **Rerun**
+restores the initial simulated database and executes again. An intentional exit
+`1` means the test found an agent failure; it is not an installation failure.
 
-## Example failure
+## Test your own agent
 
-Browse [checked-in JSON/HTML evidence and measured counts](examples/README.md),
-including a failed timeout trace and its corrected-agent rerun.
+After installation, try the independent example through the standard CLI:
 
-In `03_after_timeout`, the first `create_refund` commits **300 cents** but the
-middleware returns a timeout. The flawed agent retries with a new key, committing
-another **300 cents**. It tells the customer only 300 cents were refunded.
+```bash
+agent-chaos run scenarios/03_after_timeout.yaml --agent-factory examples.custom_agent:make_flawed_agent
+agent-chaos suite scenarios --agent-factory examples.custom_agent:make_corrected_agent --trials 5 --out runs/custom-suite
+```
 
-The verifier reports `exact_total_refunded` (expected 300, observed 600) and
-`no_duplicate_economic_effect`. The report shows both committed refund rows,
-the original arguments and idempotency keys, the injected `after_timeout` fault,
-and the distinction between the successful backend result and the timeout the
-agent saw. The corrected agent reconciles the original refund or retries with
-the same key, producing one economic effect. This example can be reproduced
-without a model API key.
+Replace the factory with your own `my_agent:create_agent`. A factory creates a
+fresh instance with `metadata` and `run_turn(turn, tools)`. Existing frameworks
+may need a small bridge to route tools and translate responses. The
+[integration guide](docs/CUSTOM_AGENTS.md) defines the contract, shows the runnable
+example, and explains custom reruns. Adapter code is never loaded automatically
+from a trace.
 
-## Architecture
+## Write a scenario or tool policy
 
-| Component | Responsibility |
+There are **11 sample scenarios**: eight core cases, two public reserved cases,
+and one optional tool-policy case. Root suite discovery includes only the eight
+core cases; select the other directories explicitly.
+
+```bash
+agent-chaos compare scenarios --trials 3 --seed 17 --out runs/comparison
+agent-chaos suite scenarios/tool_rules --agent corrected --trials 5 --out runs/tool-rules
+```
+
+[Scenario authoring](docs/SCENARIOS.md) covers fixtures, customer messages and
+fault timing. [Tool rules](docs/TOOL_RULES.md) let you require a lookup before a
+refund, cap attempts per request, and keep retry arguments stable. Financial
+checks still run: correct call order alone does not prove a correct refund.
+
+## Read results
+
+| Exit | Meaning |
 | --- | --- |
-| `schema.py` | Pydantic contracts; version 1 YAML scenarios; strict integer cents |
-| `payments.py` | Authoritative SQLite ledger; transactional balance limits and global idempotency |
-| `faults.py` | Seeded fault schedule; backend results kept separate from agent observations |
-| `agents.py` | Intentionally flawed and corrected scripted refund policies |
-| `openai_agent.py` | One optional OpenAI Responses API adapter using the same tools |
-| `verifier.py` | Independent deterministic financial and structured-claim checks |
-| `runner.py` | Isolated state, recording, snapshot restoration, trial summaries |
-| `reports.py`, `cli.py` | Static escaped HTML, JSON, CLI inspection and comparisons |
+| `0` | Pass, or successful read/export operation |
+| `1` | Agent violated a financial, claim or configured tool rule |
+| `2` | Harness, configuration, provider, I/O or trace-validation error |
+| `3` | Inconclusive: uncertainty or unassessed conversational prose |
 
-The agent gets only tool observations. The verifier reads authoritative snapshots
-and events, not the agent's success label. It checks the right payment/customer,
-exact amount, balance safety, duplicate economic effects, unrelated state, and
-claims supported by observations available before the response.
+A broken or inconclusive test never counts as a pass. Suite reports show counts
+per scenario. Built-in comparison expects flawed-agent failures; see the
+[CLI reference](docs/CLI.md) for its exit behavior and all commands.
 
-Read [API semantics and correctness rules](docs/API.md) and the
-[sequential implementation plan](docs/PLAN.md). One request ID means one business
-intent. Messages in a turn arrive before tool execution; the latest amount wins.
-Repeating that request across turns must not issue another refund. Changing an
-amount after an execution turn is outside this MVP and rejected by validation.
+Full CLI trace validation checks internal consistency, including ledger effects,
+fault timing and the recorded verdict. It does not prove authenticity. Seeds
+make scripted fault schedules reproducible; live model reruns can vary.
 
-## Fixed scenarios
-
-| Scenario | Expected behavior |
-| --- | --- |
-| 01 Normal | One confirmed 300-cent refund |
-| 02 Failure before creation | Safe retry; one refund |
-| 03 Success followed by timeout | Reconcile the committed refund |
-| 04 Retry after ambiguous timeout | Preserve the original key even when reconciliation tools fail |
-| 05 Temporarily invisible refund | Absence is not failure; confirm or report uncertainty |
-| 06 Customer changes amount | Latest pre-execution amount, 200 cents |
-| 07 Customer repeats request | Reuse the existing outcome; one refund |
-| 08 Malformed creation response | Reconcile a possible commit; no duplicate |
-
-Each YAML includes `expected_behavior`. Additional reserved cases combine an
-ambiguous commit near the balance limit with a new request, and rate limiting
-with malformed data. Normal suite discovery excludes the `heldout` subdirectory.
-They were evaluated only after the development suite and adapter tests passed.
-This small author-designed holdout is useful regression evidence, not an
-independent scientific benchmark; after publication these cases are public.
-
-## Workflow website
-
-For a simple explanation of the project, launch the included static walkthrough:
+## Explore the local website
 
 ```bash
-python3 -m http.server 8765 --bind 127.0.0.1 --directory examples
+python -m http.server 8765 --bind 127.0.0.1 --directory examples
 ```
 
-Open [the local workflow website](http://127.0.0.1:8765/). Step through a refund,
-compare the flawed and corrected policies, see actual ledger state versus agent
-observations, and open the measured reports. The page also explains the five
-components and provides offline CLI commands. It is educational playback of
-recorded examples; fresh test execution happens through the CLI.
+Open [the workflow explanation](http://127.0.0.1:8765/) or
+[the trace viewer](http://127.0.0.1:8765/viewer.html). Imported files stay in the
+browser tab. The viewer displays recorded evidence and accepts single-run JSON
+up to 10 MiB; use `agent-chaos inspect` for full validation. Neither page runs
+an agent. Public Vercel deployment is not confirmed.
 
-Open [the local trace viewer](http://127.0.0.1:8765/viewer.html) to inspect your
-own `trace.json`, up to 10 MiB. File imports stay in the browser tab and are
-displayed as recorded evidence. Browser display checks are less strict than the
-CLI's full consistency validation; run `agent-chaos inspect path/to/trace.json`
-before relying on the recorded verdict. No agent is executed by the viewer.
-Its dependency-free JavaScript tests run with `node --test tests/viewer.test.cjs`.
+## How it works
 
-To publish the walkthrough on your own Vercel account, run from the repository
-root:
+Customer request → agent → fault middleware → simulated payment service → agent reply.
+The recorder saves the interaction; the independent verifier checks authoritative
+state and observations available before each reply.
 
-```bash
-npx -y vercel login
-npx -y vercel deploy --prod --yes --project agent-chaos
-```
+The service enforces ownership, remaining balance and global idempotency keys.
+The verifier checks exact amounts, duplicate economic effects, unrelated state,
+structured claims and optional tool rules. [API semantics](docs/API.md) define
+that contract; [trace validation](docs/TRACE_VALIDATION.md) explains replay checks.
 
-`vercel.json` serves `examples/` without a build or dependency installation.
-`.vercelignore` limits CLI uploads to the static examples and deployment config.
-The Python harness and SQLite execution remain local CLI tools.
+## Next steps
 
-## Optional live model
+- [Setup and optional OpenAI runs](docs/GETTING_STARTED.md)
+- [CLI commands, report paths and automation](docs/CLI.md)
+- [Author a refund scenario](docs/SCENARIOS.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Measured offline evidence](examples/README.md)
+- [Optional generation, minimization and budgeted studies](docs/EXPERIMENTS.md)
+- [Development checks and contribution workflow](CONTRIBUTING.md)
 
-```bash
-pip install -e '.[openai]'
-export OPENAI_API_KEY=your_key
-agent-chaos run scenarios/03_after_timeout.yaml --provider openai --model YOUR_MODEL_ID
-agent-chaos compare scenarios --provider openai --model YOUR_MODEL_ID --trials 5
-```
-
-Choose a model available to your account that supports tools and structured
-outputs. The adapter follows the official
-[OpenAI function-calling documentation](https://developers.openai.com/api/docs/guides/function-calling).
-It uses bounded tool loops, records the exact prompts and raw model outputs,
-records token usage, disables hidden SDK retries, and leaves cost null when the
-provider supplies no dollar cost. API calls may incur charges. Model unavailability
-is a harness error. Invalid target responses or exhausted target steps are agent
-failures. Live integration has mocked tests; no live-model benchmark is claimed.
-
-Financial checks remain deterministic. Model-generated customer prose is
-**unassessed**, recorded separately from structured claims, and makes otherwise
-correct live runs inconclusive. No model judge silently overrides financial rules.
-Scripted template sentences are checked deterministically. Uncertainty is also
-inconclusive when finances are otherwise correct, never a pass.
-
-## Reproducible validation
-
-```bash
-pytest -q
-pytest -q tests/test_payments.py  # Balance boundaries and synchronized SQLite races
-ruff check src tests
-ruff format --check src tests
-agent-chaos compare scenarios --trials 3 --seed 17 --out runs/fixed
-agent-chaos compare scenarios/heldout --trials 5 --seed 17 --out runs/heldout
-```
-
-The first verified offline development run measured **18 failures / 24 trials**
-for the flawed script and **0 / 24** for the corrected script. The reserved cases
-measured **10 / 10** and **0 / 10**, respectively. Results are counted by scenario,
-including harness errors and inconclusive trials separately. Normal execution
-passes for both scripts; failures expose specific fault or interaction handling.
-These counts are deterministic demonstration results, not LLM reliability rates
-or confidence estimates. Repeated identical scripts offer regression evidence;
-they do not provide independent statistical samples.
-
-Payment-service tests cover restored partial refunds, exact remaining balance,
-one-cent overflow, and rollback after conflicting key reuse. Separate SQLite
-connections synchronize before competing: identical keys produce one commit and
-replays; conflicting parameters produce one winner; distinct keys cannot consume
-more than the remaining balance. The three four-worker race cases each run five
-times. Winner order is unspecified, and these local tests are not a throughput
-benchmark or an exhaustive concurrency proof.
-
-## Optional experiments after the MVP
-
-```bash
-agent-chaos generate scenarios/01_normal.yaml --output runs/generated.yaml
-agent-chaos minimize runs/<failed-run-id>/trace.json --trials 3 --budget 60
-agent-chaos study scenarios --agent flawed --budget 24 --seed 17 --out runs/study
-```
-
-Generation is scripted offline by default; `--provider openai --model ...` uses
-an optional proposal agent. The minimizer removes faults/messages/turns only when
-the same violated rule survives every trial. The study compares fixed cases,
-generated proposals, and seeded random faults with equal target-execution counts.
-Generation overhead is additional and recorded. See [experiment semantics,
-budgets, and limitations](docs/EXPERIMENTS.md).
-
-## Evidence and limitations
-
-Traces record initial/final database snapshots, all user messages and responses,
-tool arguments/results, exact fault decisions, backend events, scenario hash,
-package/source versions, prompt/configuration/model metadata, latency, tokens,
-and available cost. Local reports may contain customer text or model outputs;
-use simulated input and review traces before sharing them. API keys are not
-intentionally recorded. Traces are evidence files, not signed tamper-proof audits.
-
-Offline playback inspects saved events; a scenario rerun restores initial state
-and executes the agent again. Fault seeds reproduce scheduling decisions, **not
-live model output**. A changed source version can change behavior; pin the recorded
-commit for strict code reproduction. Timing and run IDs vary even for scripts.
-
-This MVP has one workflow, one provider, immediate successful refund settlement,
-logical-read visibility delays, and bounded retries. It does not cover asynchronous
-payment settlement, genuine concurrent customer conversations, fraud policy,
-production tools, authentication, billing, distributed execution, monitoring,
-automatic fixes, or arbitrary agent frameworks. A corrected demo passing a small
-suite is not a proof of reliability outside the declared contract.
-
-Contributions: use small focused commits, add a scenario/test for behavioral
-changes, and run the checks above. See [LICENSE](LICENSE).
+This project does not provide arbitrary framework integration, production payment
+processing, hosted test execution, monitoring or automatic fixes. Passing the
+included scripted cases is regression evidence, not proof of general reliability.
+See [LICENSE](LICENSE).
