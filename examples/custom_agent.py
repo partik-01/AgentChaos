@@ -7,7 +7,9 @@ from pathlib import Path
 
 from agent_chaos.adapters import RefundTools
 from agent_chaos.agents import claim, confirmed
-from agent_chaos.runner import read_trace, rerun, run_scenario
+from agent_chaos.cli import positive, suite_paths
+from agent_chaos.reports import write_html
+from agent_chaos.runner import read_trace, rerun, run_scenario, summarize, write_json
 from agent_chaos.schema import Claim, Message, Turn, load_scenario
 
 
@@ -71,11 +73,43 @@ class MySupportAgent:
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=["run", "rerun"])
-    parser.add_argument("input", help="YAML scenario for run; trace JSON/directory for rerun")
+    parser.add_argument("mode", choices=["run", "rerun", "suite"])
+    parser.add_argument("input", help="Scenario YAML/directory for run/suite; trace for rerun")
     parser.add_argument("--policy", choices=["flawed", "corrected"], default="corrected")
     parser.add_argument("--out", default="runs/custom")
+    parser.add_argument("--trials", type=positive, default=1, help="Trials per scenario for suite")
     args = parser.parse_args(argv)
+    if args.mode != "suite" and args.trials != 1:
+        parser.error("--trials applies only to suite")
+    if args.mode == "suite":
+        scenarios = [load_scenario(path) for path in suite_paths(args.input)]
+        traces = []
+        for scenario in scenarios:
+            for trial in range(args.trials):
+                target = MySupportAgent(args.policy)
+                traces.append(
+                    run_scenario(
+                        scenario.model_copy(update={"seed": scenario.seed + trial}),
+                        target.metadata["version"],
+                        agent=target,
+                        provider="custom",
+                        out=args.out,
+                    )
+                )
+        bundle = {"summary": summarize(traces), "runs": traces}
+        write_json(Path(args.out) / "suite.json", bundle)
+        write_html(Path(args.out) / "suite.html", bundle)
+        print(json.dumps(bundle["summary"], indent=2))
+        counts = bundle["summary"]["counts"]
+        return (
+            2
+            if counts["harness_error"]
+            else 1
+            if counts["agent_failure"]
+            else 3
+            if counts["inconclusive"]
+            else 0
+        )
     agent = MySupportAgent(args.policy)  # Fresh memory for every execution.
     options = {
         "agent": agent,

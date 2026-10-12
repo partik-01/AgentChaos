@@ -133,3 +133,29 @@ def test_example_runner_failure_playback_reproduction_and_fix(tmp_path, capsys):
         assert fresh["initial_state"] == recorded["initial_state"]
         assert sum(r["amount_cents"] for r in fresh["final_state"]["refunds"]) == amount
     assert Path(output["trace"]).read_bytes() == before
+
+
+def test_example_suite_creates_isolated_targets_and_counts(tmp_path, capsys):
+    example = example_module()
+    assert (
+        example.main(
+            [
+                "suite",
+                "scenarios/07_repeated_request.yaml",
+                "--trials",
+                "3",
+                "--out",
+                str(tmp_path),
+            ]
+        )
+        == 0
+    )
+    summary = json.loads(capsys.readouterr().out)
+    bundle = json.loads((tmp_path / "suite.json").read_text())
+    assert summary["counts"]["pass"] == summary["total_trials"] == 3
+    assert len({t["run_id"] for t in bundle["runs"]}) == 3
+    assert [t["scenario"]["seed"] for t in bundle["runs"]] == [17, 18, 19]
+    for trace in bundle["runs"]:
+        validate_trace(trace)
+        assert len(trace["final_state"]["refunds"]) == 1
+    assert (tmp_path / "suite.html").is_file()
