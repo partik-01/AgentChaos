@@ -169,6 +169,7 @@ inconclusive when finances are otherwise correct, never a pass.
 
 ```bash
 pytest -q
+pytest -q tests/test_payments.py  # Balance boundaries and synchronized SQLite races
 ruff check src tests
 ruff format --check src tests
 agent-chaos compare scenarios --trials 3 --seed 17 --out runs/fixed
@@ -183,6 +184,14 @@ passes for both scripts; failures expose specific fault or interaction handling.
 These counts are deterministic demonstration results, not LLM reliability rates
 or confidence estimates. Repeated identical scripts offer regression evidence;
 they do not provide independent statistical samples.
+
+Payment-service tests cover restored partial refunds, exact remaining balance,
+one-cent overflow, and rollback after conflicting key reuse. Separate SQLite
+connections synchronize before competing: identical keys produce one commit and
+replays; conflicting parameters produce one winner; distinct keys cannot consume
+more than the remaining balance. The three four-worker race cases each run five
+times. Winner order is unspecified, and these local tests are not a throughput
+benchmark or an exhaustive concurrency proof.
 
 ## Optional experiments after the MVP
 

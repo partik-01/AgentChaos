@@ -229,7 +229,7 @@ recorded-error handling, evidence location, and limits. Validation checks intern
 consistency, not provenance or authenticity, and requires no model API key.
 This task is complete; no suggested follow-up feature was started.
 
-## Refund boundary and concurrency task — in progress
+## Refund boundary and concurrency task — completed
 
 The user authorized the next improvement from the review. Scope: independently
 test the simulated payment service with prior partial refunds, exact remaining
@@ -238,3 +238,22 @@ through separate SQLite connections. Check ledger state, idempotent replay,
 conflicting key reuse, transaction rollback and backend event counts. Implement
 one improvement at a time, commit each, run the full suite, then push to GitHub.
 No new website or model-provider feature is included in this task.
+
+Sequential commits:
+
+- `fe5b752`: scope and acceptance plan before implementation.
+- `1b66d2d`: restored partial-refund balance boundaries (including one cent
+  remaining), one-cent overflow rollback, valid retry after rejection, and all
+  four conflicting-key parameter checks.
+- `505b8b5`: barrier-synchronized SQLite connections, stronger existing overdraw
+  check, and five repetitions each of identical-key, conflicting-key and
+  distinct-key partial-balance races.
+
+Final local validation: **31 payment-service tests passed; 191 total tests passed**.
+Ruff lint and formatting passed. The race tests executed 62 competing requests
+across fresh databases, with expected commit/replay/rejection counts and no
+unexpected lock errors. No service behavior change was needed: the existing
+transaction and idempotency implementation satisfied the new independent tests.
+The API documentation and README include the command, tested outcomes and limits.
+These tests require no API key and make no benchmark or exhaustive concurrency
+claim. This task is complete; no following feature was started.

@@ -22,6 +22,31 @@ cannot overdraw. `customer_mismatch`, `payment_not_found`, and
 be updated or deleted through the tool interface. Snapshot restoration is a
 harness-only operation, used to isolate trials and restore recorded initial state.
 
+## Balance and concurrent-request validation
+
+`pytest -q tests/test_payments.py` independently tests the service without agents
+or fault middleware. Restored partial refunds are included in the remaining
+balance. An exact-balance refund succeeds; a one-cent excess is rejected without
+changing the ledger, reserving its key, leaving a transaction open, or recording
+a commit. An identical replay still succeeds when the remaining balance is zero.
+Changing any of the four identity/amount parameters under an existing key rejects
+the request, and a subsequent valid replay still returns the original refund.
+
+Race tests use a barrier and separate connections created in their owning worker
+threads. They assert business outcomes rather than which thread wins:
+
+- Four identical full-balance requests: one refund row, one commit, three replays.
+- Four amounts under one key: one parameter-preserving commit, three conflicts.
+- Four distinct 300-cent requests after a prior 400-cent refund on a 1,000-cent
+  payment: two commits, two insufficient-balance rejections, final total 1,000.
+
+Each four-worker case repeats five times on a fresh file-backed database. The
+existing two-worker overdraw test also synchronizes its competing calls. Tests
+check refund IDs, backend events, rejected transactions and unrelated payment
+balances. They cover the local simulated service; they do not promise a stable
+winner order, measure throughput, or establish behavior under every scheduling
+or lock-contention condition.
+
 The middleware returns errors as tool observations. `executed: false` applies to
 known rejection or pre-execution failure; `executed: unknown` applies to timeout
 or malformed data. The agent never receives the authoritative `backend_result`
