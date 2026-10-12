@@ -228,3 +228,13 @@ The README and [TRACE_VALIDATION.md](TRACE_VALIDATION.md) document the contract,
 recorded-error handling, evidence location, and limits. Validation checks internal
 consistency, not provenance or authenticity, and requires no model API key.
 This task is complete; no suggested follow-up feature was started.
+
+## Refund boundary and concurrency task — in progress
+
+The user authorized the next improvement from the review. Scope: independently
+test the simulated payment service with prior partial refunds, exact remaining
+balance and one-cent-over-balance requests, and synchronized competing requests
+through separate SQLite connections. Check ledger state, idempotent replay,
+conflicting key reuse, transaction rollback and backend event counts. Implement
+one improvement at a time, commit each, run the full suite, then push to GitHub.
+No new website or model-provider feature is included in this task.
