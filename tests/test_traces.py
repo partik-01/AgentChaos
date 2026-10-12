@@ -291,3 +291,69 @@ def test_recorded_scenario_cannot_silently_default_its_version(recorded):
     ).hexdigest()
     with pytest.raises(ValueError, match="missing recorded scenario fields"):
         validate_trace(recorded)
+
+
+@pytest.mark.parametrize("seed", range(5))
+def test_probabilistic_read_fault_schedules_remain_valid(tmp_path, seed):
+    from agent_chaos.schema import Fault
+
+    scenario = load_scenario("scenarios/01_normal.yaml").model_copy(
+        update={
+            "seed": seed,
+            "faults": [Fault(tool="get_payment", kind="after_timeout", probability=0.5)],
+        }
+    )
+    validate_trace(run_scenario(scenario, out=tmp_path))
+
+
+def test_existing_refunds_and_long_visibility_uncertainty_remain_valid(tmp_path):
+    from agent_chaos.schema import Fault
+
+    scenario = load_scenario("scenarios/01_normal.yaml")
+    initial = {
+        "payments": [p.model_dump() for p in scenario.payments],
+        "refunds": [
+            {
+                "refund_id": "rf_000001",
+                "payment_id": "pay_alice",
+                "customer_id": "alice",
+                "amount_cents": 100,
+                "idempotency_key": "previous",
+                "request_id": "previous",
+                "status": "succeeded",
+            }
+        ],
+    }
+    trace = run_scenario(scenario, initial=initial, out=tmp_path)
+    assert trace["result"]["status"] == "pass"
+    validate_trace(trace)
+    scenario = scenario.model_copy(
+        update={
+            "faults": [
+                Fault(kind="visibility_delay", hidden_reads=100),
+                Fault(kind="after_timeout", occurrence=2),
+                Fault(kind="malformed", occurrence=3),
+            ]
+        }
+    )
+    trace = run_scenario(scenario, out=tmp_path)
+    assert trace["result"]["status"] == "inconclusive"
+    validate_trace(trace)
+
+
+def test_agent_setup_error_remains_valid_without_model_api_call(tmp_path):
+    trace = run_scenario(load_scenario("scenarios/01_normal.yaml"), provider="openai", out=tmp_path)
+    assert trace["result"]["status"] == "harness_error"
+    assert trace["tool_events"] == trace["responses"] == []
+    validate_trace(trace)
+
+
+def test_decreasing_response_boundary_and_false_harness_classification_are_rejected(tmp_path):
+    trace = run_scenario(load_scenario("scenarios/07_repeated_request.yaml"), out=tmp_path)
+    trace["responses"][1]["tool_event_end"] = 0
+    with pytest.raises(ValueError, match="event boundary"):
+        validate_trace(trace)
+    trace = run_scenario(load_scenario("scenarios/01_normal.yaml"), out=tmp_path)
+    trace["result"]["error"] = "invented provider error"
+    with pytest.raises(ValueError, match="only harness errors"):
+        validate_trace(trace)
