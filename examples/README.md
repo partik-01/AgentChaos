@@ -57,3 +57,11 @@ from the repository root, then open `http://127.0.0.1:8765/`.
 `index.html` and `workflow.js` provide a six-step explanation, a flawed/corrected
 policy switch, a project component map, links to these reports, and copyable CLI
 commands. The walkthrough explains recorded evidence; it does not execute tests.
+
+`viewer.html` opens your own single-run `trace.json` using a local file picker.
+It displays rules, before/after balances, tools, faults, claims and version
+metadata. Selected files are not uploaded or saved to browser storage. The
+browser checks display structure only; use the CLI for full trace consistency
+validation. Neither the viewer nor the walkthrough runs agents. See
+[the usability assessment](../docs/USABILITY.md) for adoption limits and measured
+fresh-install evidence. Node tests: `node --test tests/viewer.test.cjs`.

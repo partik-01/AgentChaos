@@ -9,6 +9,13 @@ MIT licensed. Python 3.11+. **Simulated payments only.** No real payment credent
 or payment network access. The default agents are deterministic Python scripts;
 the optional OpenAI adapter runs a real tool-calling model.
 
+**Current usefulness:** a working refund-testing sandbox for developers, with
+real SQLite executions and failure evidence. It is early-stage, limited to this
+simulated workflow, and requires an adapter for an existing external agent. The
+website explains examples and views traces; it does not execute tests. No live
+model benchmark or external adoption is claimed. See [who can use it today,
+fresh-install evidence, and limits](docs/USABILITY.md).
+
 ## Quick start (no API key)
 
 ```bash
@@ -128,6 +135,13 @@ compare the flawed and corrected policies, see actual ledger state versus agent
 observations, and open the measured reports. The page also explains the five
 components and provides offline CLI commands. It is educational playback of
 recorded examples; fresh test execution happens through the CLI.
+
+Open [the local trace viewer](http://127.0.0.1:8765/viewer.html) to inspect your
+own `trace.json`, up to 10 MiB. File imports stay in the browser tab and are
+displayed as recorded evidence. Browser display checks are less strict than the
+CLI's full consistency validation; run `agent-chaos inspect path/to/trace.json`
+before relying on the recorded verdict. No agent is executed by the viewer.
+Its dependency-free JavaScript tests run with `node --test tests/viewer.test.cjs`.
 
 To publish the walkthrough on your own Vercel account, run from the repository
 root:

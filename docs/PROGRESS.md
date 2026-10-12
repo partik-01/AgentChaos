@@ -258,7 +258,7 @@ The API documentation and README include the command, tested outcomes and limits
 These tests require no API key and make no benchmark or exhaustive concurrency
 claim. This task is complete; no following feature was started.
 
-## Offline trace viewer and usability assessment — in progress
+## Offline trace viewer and usability assessment — completed
 
 The user authorized the offline JSON viewer and requested an honest assessment
 of usefulness for other developers. Scope: a static page that reads a selected
@@ -269,3 +269,24 @@ Reject unsupported/missing display data; label the verdict as recorded evidence.
 Test parsing, unsafe text rendering, example runs and invalid imports. Verify a
 fresh installation outside the working checkout, document real adoption limits,
 commit sequentially, then push. No broader frontend or provider expansion.
+
+Sequential work: `9b732a9` recorded the plan; `2bd8c23` added the static viewer
+and 17 JavaScript tests; `21f88ef` linked it from the walkthrough and added its
+tests to CI. Browser imports displayed both saved examples and a newly generated
+250-cent failure (500 cents committed), preserved imported markup as text with
+no image/script elements, cleared evidence, handled keyboard Enter, and rejected
+invalid/oversized files without leaving an old verdict visible.
+
+Fresh usability check: normal isolated wheel build, runtime installation in a
+new virtual environment outside the checkout, verified site-packages imports,
+new 250-cent scenario, flawed failure at 500 cents, corrected pass at 250 cents,
+inspection, corrected rerun and JSON/HTML export. No API key/model call needed.
+An initial build with isolation explicitly disabled lacked setuptools; normal
+pip build isolation worked without changing dependencies.
+
+Final verification: **191 Python tests and 17 JavaScript tests passed**; lint and
+format passed. Local evidence and screenshot are in `runs/viewer-usability/`.
+[USABILITY.md](USABILITY.md) explains the working narrow sandbox, adapter work
+needed for other agents, browser display-versus-validation distinction, missing
+live-model/adoption evidence and pending Vercel authentication. No following
+feature was started.
