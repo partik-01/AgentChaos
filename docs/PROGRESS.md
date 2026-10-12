@@ -196,7 +196,7 @@ Vercel remains logged out; live model execution and remote CI are unverified.
 This review/cleanup task is complete. Ask for the next task before implementing
 any of the proposed additions.
 
-## Full trace validation task — in progress
+## Full trace validation task — completed
 
 The user authorized full trace validation and a final GitHub push. The work plan
 and acceptance rules are in [TRACE_VALIDATION.md](TRACE_VALIDATION.md): typed
@@ -204,3 +204,27 @@ contracts, cross-section checks, validation before all trace-consuming CLI paths
 and direct rerun execution, damaged-trace regressions, and compatibility checks
 for recorded failures and partial harness errors. No other feature task is being
 started.
+
+Sequential implementation commits:
+
+- `cf6b225`: contract, plan and progress checkpoint before implementation.
+- `6963009`: typed nested trace models, required sections and structural tests.
+- `15b98e8`: cross-section consistency, in-memory effect reconstruction and verdict
+  verification; valid saved failures and mocked SDK evidence accepted.
+- `c41f9b0`: strict file imports, duplicate-key rejection and validation before
+  direct reruns; CLI regressions prove rejection before execution/output.
+- `0fdd63a`: compatibility cases for prior refunds, probabilistic read faults,
+  unresolved visibility and agent setup errors.
+
+Final validation: **169 tests passed**, lint/format/diff checks passed. Offline
+playback, export, minimization and both rerun policies completed. Timeout failure
+reproduced 600 cents; corrected rerun committed 300 cents. Three-trial development
+comparison: flawed 18/24 failures, corrected 24/24 passes, no harness errors or
+inconclusive trials. Every newly produced trace validated; the source example
+was unchanged. Deliberately modified ledger evidence was rejected with exit 2
+before its rerun directory was created.
+
+The README and [TRACE_VALIDATION.md](TRACE_VALIDATION.md) document the contract,
+recorded-error handling, evidence location, and limits. Validation checks internal
+consistency, not provenance or authenticity, and requires no model API key.
+This task is complete; no suggested follow-up feature was started.

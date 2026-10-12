@@ -45,6 +45,15 @@ failures, but harness errors in either agent exit `2`; inconclusive flawed-agent
 trials cannot produce a successful comparison. CLI usage errors exit `2`. A broken
 provider or invalid scenario can never count as a pass.
 
+Recorded single-run traces are validated before `inspect`/`playback`, `export`,
+`minimize`, and `rerun`, including direct Python reruns. Checks cover required
+fields and strict types, the scenario hash, seeded faults, event references,
+authoritative ledger effects, response timing, model usage, and the recorded
+verdict. Invalid evidence exits `2` before execution or output creation; valid
+agent failures and partial harness errors remain inspectable. Validation is
+offline and preserves the original evidence. It checks consistency, not
+authenticity. See [the trace contract](docs/TRACE_VALIDATION.md).
+
 ## Example failure
 
 Browse [checked-in JSON/HTML evidence and measured counts](examples/README.md),
