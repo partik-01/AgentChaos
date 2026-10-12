@@ -226,7 +226,11 @@ def main(argv=None):
             }
             save_bundle(Path(args.out) / "comparison.json", data)
             print(json.dumps(data["summary"], indent=2))
-            # Known flawed failures are intentional; corrected runs determine comparison exit status.
+            # Intentional flawed failures are expected; execution errors on either side are not.
+            if left["summary"]["counts"]["harness_error"]:
+                return 2
+            if left["summary"]["counts"]["inconclusive"] and exit_code(right["summary"]) == 0:
+                return 3
             return exit_code(right["summary"])
         if args.command == "rerun":
             trace = rerun(

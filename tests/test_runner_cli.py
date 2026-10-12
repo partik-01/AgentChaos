@@ -186,3 +186,34 @@ def test_reproduction_command_quotes_paths_with_spaces(tmp_path):
     assert tokens[:2] == ["agent-chaos", "rerun"]
     assert Path(tokens[2]).is_file()
     assert main(tokens[1:] + ["--out", str(tmp_path / "rerun")]) == 0
+
+
+@pytest.mark.parametrize(
+    "flawed_status,corrected_status,expected_exit",
+    [
+        ("agent_failure", "pass", 0),
+        ("harness_error", "pass", 2),
+        ("harness_error", "agent_failure", 2),
+        ("inconclusive", "pass", 3),
+        ("pass", "harness_error", 2),
+        ("pass", "inconclusive", 3),
+        ("pass", "agent_failure", 1),
+    ],
+)
+def test_comparison_does_not_hide_execution_errors(
+    tmp_path, monkeypatch, capsys, flawed_status, corrected_status, expected_exit
+):
+    def suite(args, agent):
+        status = flawed_status if agent == "flawed" else corrected_status
+        return {
+            "summary": summarize(
+                [{"scenario": {"name": "comparison"}, "result": {"status": status}}]
+            ),
+            "runs": [],
+        }
+
+    monkeypatch.setattr("agent_chaos.cli.execute_suite", suite)
+    assert main(["compare", "scenarios", "--out", str(tmp_path)]) == expected_exit
+    saved = json.loads((tmp_path / "comparison.json").read_text())
+    assert saved["summary"]["flawed"]["counts"][flawed_status] == 1
+    assert saved["summary"]["corrected"]["counts"][corrected_status] == 1

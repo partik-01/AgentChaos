@@ -40,8 +40,9 @@ agent-chaos compare scenarios/heldout --trials 5 --out runs/holdout
 ```
 
 Exit codes: `0` pass (or successful inspection/export); `1` agent failure;
-`2` harness error; `3` inconclusive. Comparison's exit code reflects the corrected
-agent, since flawed failures are intentional. CLI usage errors exit `2`. A broken
+`2` harness error; `3` inconclusive. Comparison ignores intentional flawed-agent
+failures, but harness errors in either agent exit `2`; inconclusive flawed-agent
+trials cannot produce a successful comparison. CLI usage errors exit `2`. A broken
 provider or invalid scenario can never count as a pass.
 
 ## Example failure
