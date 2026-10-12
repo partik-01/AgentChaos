@@ -5,6 +5,7 @@ import json
 import sys
 from pathlib import Path
 
+from .adapters import create_custom_agent, load_agent_factory
 from .reports import write_html
 from .runner import read_trace, rerun, run_scenario, summarize, write_json
 from .schema import load_scenario
@@ -17,12 +18,26 @@ def positive(value):
     return number
 
 
-def execution_options(parser):
+def execution_options(parser, *, custom=False):
     parser.add_argument("--agent", choices=["flawed", "corrected"], default="corrected")
     parser.add_argument("--provider", choices=["scripted", "openai"], default="scripted")
     parser.add_argument("--model", help="Required for live OpenAI runs")
     parser.add_argument("--out", default="runs", help="Evidence directory")
     parser.add_argument("--seed", type=int, help="Override the scenario fault seed")
+    if custom:
+        parser.add_argument(
+            "--agent-factory", help="Explicit local module:callable returning a custom target"
+        )
+
+
+def custom_options(factory):
+    target = create_custom_agent(factory)
+    return {
+        "agent": target,
+        "agent_version": target.metadata["version"],
+        "provider": "custom",
+        "model": target.metadata.get("model"),
+    }
 
 
 def suite_paths(path):
@@ -36,16 +51,20 @@ def suite_paths(path):
 def execute_suite(args, agent):
     # Validate all fixtures before any model spending.
     scenarios = [load_scenario(p) for p in suite_paths(args.path)]
+    factory = (
+        load_agent_factory(args.agent_factory) if getattr(args, "agent_factory", None) else None
+    )
     traces = []
     for scenario in scenarios:
         for trial in range(args.trials):
             seed = (args.seed if args.seed is not None else scenario.seed) + trial
+            options = (
+                custom_options(factory)
+                if factory
+                else {"agent_version": agent, "provider": args.provider, "model": args.model}
+            )
             trace = run_scenario(
-                scenario.model_copy(update={"seed": seed}),
-                agent,
-                out=args.out,
-                provider=args.provider,
-                model=args.model,
+                scenario.model_copy(update={"seed": seed}), out=args.out, **options
             )
             traces.append(trace)
     return {"summary": summarize(traces), "runs": traces}
@@ -76,11 +95,11 @@ def main(argv=None):
     commands = parser.add_subparsers(dest="command", required=True)
     one = commands.add_parser("run", help="Execute one YAML scenario")
     one.add_argument("scenario")
-    execution_options(one)
+    execution_options(one, custom=True)
     suite = commands.add_parser("suite", help="Run multiple isolated trials per scenario")
     suite.add_argument("path")
     suite.add_argument("--trials", type=positive, default=3)
-    execution_options(suite)
+    execution_options(suite, custom=True)
     inspect = commands.add_parser(
         "inspect", aliases=["playback"], help="Offline read-only trace playback"
     )
@@ -91,6 +110,9 @@ def main(argv=None):
     repeat.add_argument("--provider", choices=["scripted", "openai"])
     repeat.add_argument("--model")
     repeat.add_argument("--out", default="runs")
+    repeat.add_argument(
+        "--agent-factory", help="Explicit local module:callable for a fresh custom target"
+    )
     compare = commands.add_parser(
         "compare", help="Matched fault-seed trials for both agent versions"
     )
@@ -126,6 +148,14 @@ def main(argv=None):
     execution_options(research)
     args = parser.parse_args(argv)
     try:
+        if getattr(args, "agent_factory", None) and (
+            args.provider not in (None, "scripted")
+            or args.model is not None
+            or args.agent not in (None, "corrected")
+        ):
+            raise ValueError(
+                "--agent-factory supplies identity/model; omit --provider, --model and --agent"
+            )
         if args.command == "generate":
             from .generation import generate_scenario, write_scenario
 
@@ -190,9 +220,12 @@ def main(argv=None):
             scenario = load_scenario(args.scenario)
             if args.seed is not None:
                 scenario = scenario.model_copy(update={"seed": args.seed})
-            trace = run_scenario(
-                scenario, args.agent, out=args.out, provider=args.provider, model=args.model
+            options = (
+                custom_options(load_agent_factory(args.agent_factory))
+                if args.agent_factory
+                else {"agent_version": args.agent, "provider": args.provider, "model": args.model}
             )
+            trace = run_scenario(scenario, out=args.out, **options)
             print(
                 json.dumps(
                     {
@@ -233,12 +266,16 @@ def main(argv=None):
                 return 3
             return exit_code(right["summary"])
         if args.command == "rerun":
+            recorded = read_trace(args.trace)  # Validate before importing user-selected code.
+            options = (
+                custom_options(load_agent_factory(args.agent_factory))
+                if args.agent_factory
+                else {"agent_version": args.agent, "provider": args.provider, "model": args.model}
+            )
             trace = rerun(
-                read_trace(args.trace),
+                recorded,
                 out=args.out,
-                agent_version=args.agent,
-                provider=args.provider,
-                model=args.model,
+                **options,
             )
             print(
                 json.dumps(

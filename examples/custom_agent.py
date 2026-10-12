@@ -71,6 +71,14 @@ class MySupportAgent:
         return claim(message, "uncertain")
 
 
+def make_flawed_agent():
+    return MySupportAgent("flawed")
+
+
+def make_corrected_agent():
+    return MySupportAgent("corrected")
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=["run", "rerun", "suite"])
