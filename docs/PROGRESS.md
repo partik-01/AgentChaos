@@ -257,3 +257,15 @@ transaction and idempotency implementation satisfied the new independent tests.
 The API documentation and README include the command, tested outcomes and limits.
 These tests require no API key and make no benchmark or exhaustive concurrency
 claim. This task is complete; no following feature was started.
+
+## Offline trace viewer and usability assessment — in progress
+
+The user authorized the offline JSON viewer and requested an honest assessment
+of usefulness for other developers. Scope: a static page that reads a selected
+single-run trace locally, shows recorded verdict/violations, tool and backend
+evidence, initial/final state, customer claims, metadata and reproduction command.
+No agent execution, server upload, or browser claim of full Python validation.
+Reject unsupported/missing display data; label the verdict as recorded evidence.
+Test parsing, unsafe text rendering, example runs and invalid imports. Verify a
+fresh installation outside the working checkout, document real adoption limits,
+commit sequentially, then push. No broader frontend or provider expansion.
