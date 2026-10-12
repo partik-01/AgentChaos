@@ -400,3 +400,13 @@ lint, format and diff checks passing. An initial lint run caught an unused test
 import, which was removed. No model API call or broad workflow support is claimed.
 The rules check attempted calls, not successful authorization; independent
 financial verification remains required. No following improvement was started.
+## Developer documentation and onboarding — in progress
+
+One documentation task: reorganize the README around a first successful local
+run and a reproducible failure/fix; add a documentation index, setup/CLI/scenario
+guides, troubleshooting and contribution instructions. Keep API and adapter
+details linked rather than duplicated. Explain prerequisites, expected outputs,
+exit codes, evidence paths, platform commands, custom integration limits and
+supported workflows. Verify offline commands and relative links from a fresh
+installation, run applicable checks, commit each focused improvement, and push.
+No runtime feature, deployment, new provider or benchmark claim in this task.
