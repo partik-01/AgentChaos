@@ -340,3 +340,13 @@ the new Markdown guide; formatting them resolved it. No live model/API call or
 external adoption is claimed. This is a Python integration for the refund
 sandbox, not arbitrary endpoint or workflow support. No following feature was
 started.
+## CLI custom-agent loading — in progress
+
+Reduce integration boilerplate within the refund workflow: add an explicit
+`--agent-factory module:callable` to run, suite and rerun. Load user-selected local
+code only, validate the zero-argument factory result, instantiate each trial
+separately, and record the supplied identity/version. Validate rerun evidence
+before importing target code. Never auto-import a recorded factory. Demonstrate
+normal/faulted execution and a corrected custom rerun through the standard CLI.
+Document that framework tool routing still requires integration. No HTTP agent
+protocol, arbitrary workflow or automatic framework discovery in this task.
