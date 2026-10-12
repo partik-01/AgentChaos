@@ -1,11 +1,13 @@
 import copy
+import hashlib
 import json
 from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
-from agent_chaos.runner import run_scenario
+from agent_chaos.cli import main
+from agent_chaos.runner import read_trace, rerun, run_scenario
 from agent_chaos.schema import load_scenario
 from agent_chaos.traces import Trace, validate_trace
 
@@ -191,3 +193,101 @@ def test_rejected_unknown_tool_and_bad_arguments_are_recorded_behavior(tmp_path)
     )
     assert trace["result"]["status"] == "agent_failure"
     validate_trace(trace)
+
+
+@pytest.mark.parametrize("command", ["inspect", "playback", "export", "rerun", "minimize"])
+def test_invalid_trace_cli_stops_before_execution_or_output(
+    tmp_path, recorded, monkeypatch, capsys, command
+):
+    recorded["scenario_sha256"] = "0" * 64
+    path = tmp_path / "damaged.json"
+    path.write_text(json.dumps(recorded))
+    out = tmp_path / "should-not-exist"
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("invalid trace reached execution or export")
+
+    monkeypatch.setattr("agent_chaos.runner.run_scenario", forbidden)
+    monkeypatch.setattr("agent_chaos.cli.save_bundle", forbidden)
+    argv = [command, str(path)]
+    if command == "export":
+        argv += ["--output", str(out / "report.json")]
+    elif command in ("rerun", "minimize"):
+        argv += ["--out", str(out)]
+    assert main(argv) == 2
+    assert "scenario hash mismatch" in capsys.readouterr().err
+    assert not out.exists()
+
+
+def test_direct_rerun_validates_before_run_directory_or_agent_creation(
+    tmp_path, recorded, monkeypatch
+):
+    del recorded["initial_state"]
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("invalid trace reached the runner")
+
+    monkeypatch.setattr("agent_chaos.runner.run_scenario", forbidden)
+    out = tmp_path / "should-not-exist"
+    with pytest.raises(ValueError, match="initial_state"):
+        rerun(recorded, out=out, provider="openai", model="must-not-call")
+    assert not out.exists()
+
+
+@pytest.mark.parametrize(
+    "contents",
+    [
+        '{"trace_version": 1, "trace_version": 1}',
+        '{"scenario": {"seed": 1, "seed": 2}}',
+        "[]",
+        "null",
+        "true",
+        "{broken",
+        '{"trace_version": NaN}',
+    ],
+)
+def test_invalid_json_roots_and_duplicate_keys_are_rejected(tmp_path, contents):
+    path = tmp_path / "invalid.json"
+    path.write_text(contents)
+    with pytest.raises(ValueError):
+        read_trace(path)
+
+
+def test_directory_read_and_round_trip_preserve_original_evidence(tmp_path, recorded):
+    directory = tmp_path / "recorded"
+    directory.mkdir()
+    path = directory / "trace.json"
+    path.write_text(json.dumps(recorded, indent=2))
+    before = path.read_bytes()
+    assert read_trace(directory) == recorded
+    assert path.read_bytes() == before
+    fixed = rerun(recorded, agent_version="corrected", out=tmp_path / "rerun")
+    assert fixed["result"]["status"] == "pass"
+    assert fixed["initial_state"] == recorded["initial_state"]
+    assert recorded["result"]["status"] == "agent_failure"
+
+
+def test_edited_customer_prose_cannot_be_labeled_verified_templates(recorded):
+    recorded["responses"][0]["claims"][0]["text"] = "No refund occurred."
+    recorded["result"]["conversation_assessment"]["evidence"] = ["No refund occurred."]
+    with pytest.raises(ValueError, match="deterministic claim template"):
+        validate_trace(recorded)
+
+
+@pytest.mark.parametrize("value", ["17", True, 17.0])
+def test_nested_scenario_fields_are_strict_even_with_updated_hash(recorded, value):
+    recorded["scenario"]["seed"] = value
+    recorded["scenario_sha256"] = hashlib.sha256(
+        json.dumps(recorded["scenario"], sort_keys=True).encode()
+    ).hexdigest()
+    with pytest.raises(ValueError, match="invalid trace structure"):
+        validate_trace(recorded)
+
+
+def test_recorded_scenario_cannot_silently_default_its_version(recorded):
+    del recorded["scenario"]["version"]
+    recorded["scenario_sha256"] = hashlib.sha256(
+        json.dumps(recorded["scenario"], sort_keys=True).encode()
+    ).hexdigest()
+    with pytest.raises(ValueError, match="missing recorded scenario fields"):
+        validate_trace(recorded)

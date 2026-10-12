@@ -14,9 +14,8 @@ from .agents import AgentFailure, ScriptedAgent
 from .faults import FaultMiddleware
 from .payments import PaymentService
 from .schema import Scenario
+from .traces import TRACE_VERSION, validate_trace
 from .verifier import verify
-
-TRACE_VERSION = 1
 
 
 def source_version() -> str:
@@ -165,14 +164,22 @@ def read_trace(path: str | Path) -> dict:
     path = Path(path)
     if path.is_dir():
         path = path / "trace.json"
-    data = json.loads(path.read_text())
-    if data.get("trace_version") != TRACE_VERSION:
-        raise ValueError("unsupported trace version")
-    Scenario.model_validate(data["scenario"])
+    return validate_trace(
+        json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_json_keys)
+    )
+
+
+def unique_json_keys(pairs):
+    data = {}
+    for key, value in pairs:
+        if key in data:
+            raise ValueError(f"invalid trace JSON: duplicate key {key!r}")
+        data[key] = value
     return data
 
 
 def rerun(trace: dict, *, out="runs", agent_version=None, provider=None, model=None) -> dict:
+    validate_trace(trace)
     config = trace["configuration"]
     return run_scenario(
         Scenario.model_validate(trace["scenario"]),

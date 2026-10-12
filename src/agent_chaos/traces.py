@@ -376,9 +376,19 @@ def validate_trace(data: dict) -> dict:
     )
     try:
         json.dumps(data, allow_nan=False)
-        parsed = Trace.model_validate(data)
+        parsed = Trace.model_validate(data, strict=True)
     except (ValidationError, ValueError, TypeError) as exc:
         raise ValueError(f"invalid trace structure: {exc}") from exc
+    require(
+        set(Scenario.model_fields) <= data["scenario"].keys(),
+        "scenario",
+        "missing recorded scenario fields",
+    )
+    require(
+        type(data["scenario"]["version"]) is int,
+        "scenario.version",
+        "expected an integer scenario version",
+    )
     digest = hashlib.sha256(json.dumps(data["scenario"], sort_keys=True).encode()).hexdigest()
     require(data["scenario_sha256"] == digest, "scenario_sha256", "scenario hash mismatch")
     require(data["messages"] == data["scenario"]["turns"], "messages", "must match scenario turns")
@@ -462,6 +472,15 @@ def validate_trace(data: dict) -> dict:
             "invalid or decreasing event boundary",
         )
         end = response["tool_event_end"]
+        if agent["conversation_assessment"] == "deterministic_templates":
+            from .agents import claim
+
+            for customer_claim in parsed.responses[index].claims:
+                require(
+                    customer_claim.text == claim(customer_claim, customer_claim.status).text,
+                    f"responses[{index}].claims",
+                    "text disagrees with deterministic claim template",
+                )
     for violation in data["result"]["violations"]:
         require(
             all(i < len(data["tool_events"]) for i in violation["event_indices"]),
