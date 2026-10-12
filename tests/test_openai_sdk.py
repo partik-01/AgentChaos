@@ -10,6 +10,7 @@ httpx = pytest.importorskip("httpx")
 from agent_chaos.openai_agent import OpenAIAgent  # noqa: E402
 from agent_chaos.runner import run_scenario  # noqa: E402
 from agent_chaos.schema import load_scenario  # noqa: E402
+from agent_chaos.traces import validate_trace  # noqa: E402
 
 
 def test_actual_sdk_serializes_tools_reconciles_timeout_and_records_usage(tmp_path):
@@ -104,3 +105,7 @@ def test_actual_sdk_serializes_tools_reconciles_timeout_and_records_usage(tmp_pa
     assert trace["result"]["status"] == "inconclusive"  # Model prose remains unassessed.
     assert trace["agent"]["cost_usd"] is None
     assert "offline-placeholder" not in json.dumps(trace)
+    validate_trace(trace)
+    trace["agent"]["usage"]["input_tokens"] += 1
+    with pytest.raises(ValueError, match="sum recorded model calls"):
+        validate_trace(trace)
