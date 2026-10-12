@@ -73,8 +73,12 @@ See [custom integration](CUSTOM_AGENTS.md).
 | Compare | Run directories plus `comparison.json`, `comparison.html` |
 | Export to `runs/failure.json` | `runs/failure.json`, `runs/failure.html` |
 
-Suite JSON has `summary.counts` and `summary.by_scenario`, plus individual
-`runs`. Comparison has `flawed`/`corrected` bundles and a summary. Reports show
+Suite JSON has `summary.counts` and `summary.by_scenario`, individual `runs`,
+and `progress` with state and planned/completed/remaining counts. JSON and HTML
+are checkpointed before and after each trial. Open or refresh `suite.html` to
+access recorded trials while the suite runs; its links open individual reports
+and traces. See [partial suites](PARTIAL_SUITES.md) for interruptions, factory
+errors and storage boundaries. Comparison has `flawed`/`corrected` bundles and a summary. Reports show
 expected/observed values, faults and tool/backend evidence. The recorded
 reproduction command needs an explicit factory added for custom targets.
 
@@ -86,6 +90,7 @@ reproduction command needs an explicit factory added for custom targets.
 | `1` | Agent financial, claim, output/budget or configured tool-policy failure |
 | `2` | Harness/configuration/provider/I/O/trace error; never a pass |
 | `3` | Inconclusive; never a pass |
+| `130` | Suite interrupted with Ctrl+C; partial results are incomplete |
 
 For corrected/custom regression suites, let a nonzero exit fail CI:
 

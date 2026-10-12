@@ -22,6 +22,7 @@ stderr; [CLI result meanings](CLI.md) explain `0`, `1`, `2` and `3`.
 | Initialization deadline | Inspect `execution_stop.phase`; startup/import/construction counts against the deadline. Increase it to test agent behavior rather than startup. |
 | OpenAI unavailable | Install `.[openai]`, set `OPENAI_API_KEY` in the environment and pass your available `--model`. `.env` is not automatically loaded. |
 | Viewer rejects JSON | Choose a single-run trace, not a suite summary; maximum 10 MiB. Use CLI inspect for full validation. |
+| Suite stopped early | Open `--out/suite.html` or `suite.json`; check `progress.state` and remaining trials. Factory failures are recorded and later trials continue. See [partial suites](PARTIAL_SUITES.md). |
 | Report missing | Look under `--out/RUN_ID/report.html`. Output-write failures return errors, never a pass. |
 | Website port occupied | Use another port, e.g. `python -m http.server 8766 --bind 127.0.0.1 --directory examples`. |
 

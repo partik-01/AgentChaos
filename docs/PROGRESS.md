@@ -490,7 +490,7 @@ documentation/validation follows as a separate commit. Validation used
 macOS/Python 3.12 and scripted agents; no live-model benchmark, remote CI or
 Linux/Windows execution is claimed. No following task was started.
 
-## Partial suite access — in progress
+## Partial suite access — completed
 
 One improvement: save suite JSON/HTML checkpoints before and after each trial.
 Factory errors already become recorded harness-error trials; preserve that
@@ -511,3 +511,21 @@ HTML replacement is atomic per file. Six focused checks passed, including a real
 spawned factory that fails only on its second trial and then recovers; the 79
 existing runner/factory/execution checks passed. Storage-failure coverage and
 final regression/documentation checks follow in this same task.
+
+Final verification: **285 Python tests and 17 JavaScript tests passed**; lint,
+formatting, diff checks and 92 README/docs relative links passed. Seven focused
+tests cover partial exceptions/Ctrl+C, factory recovery, empty/error suites,
+atomic HTML replacement, invalid fixtures and checkpoint-storage failures.
+A real CLI process received SIGINT during the second trial after its refund
+committed: exit 130, one earlier trace retained and validated, two trials remaining,
+and an incomplete HTML report. The unfinished trial was not invented as a trace.
+Three normal factory trials passed; three missing-factory trials were recorded
+as harness errors and the suite completed with exit 2. No model key was used.
+Local evidence is `runs/partial-suite-validation/verification.json` (ignored).
+
+Added [partial-suite guide](PARTIAL_SUITES.md), README/CLI navigation,
+troubleshooting and custom-agent guidance. Documented separate atomic JSON/HTML
+updates, hard-stop/stale-running limitations, writable-storage requirements,
+output-directory reuse, and scope limited to the standard suite command.
+Commits: `396d186` plan and `fc709df` implementation/tests; documentation and
+verification are a separate finishing commit. No additional task was started.

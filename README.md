@@ -96,6 +96,11 @@ never count as passes. [Execution-limit guide](docs/EXECUTION_LIMITS.md) include
 no-key hang/retry demonstrations and Python process requirements. Existing
 built-in/direct Python runs stay inline unless limits are supplied.
 
+Suite reports are saved **before and after every trial**. Open `--out/suite.html`
+to access recorded trial reports and traces, even while execution continues.
+Interrupted suites show remaining trials and an explicit incomplete state.
+[Partial suite guide](docs/PARTIAL_SUITES.md) explains recovery and factory errors.
+
 ## Write a scenario or tool policy
 
 There are **11 sample scenarios**: eight core cases, two public reserved cases,

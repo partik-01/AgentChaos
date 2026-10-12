@@ -23,6 +23,8 @@ or installed in the active Python environment. A class with a zero-argument
 constructor also works. The factory must return a **new instance on every call**;
 the suite calls it once per trial in a fresh spawned worker. Constructor failures
 and invalid metadata are recorded as harness errors (exit 2); suites continue.
+Suite JSON/HTML checkpoints retain completed trials before later failures; see
+[partial suite results](PARTIAL_SUITES.md) for accessing them during execution.
 Factories default to 60 seconds and 100 tool calls per run. Override with
 `--timeout-seconds` and `--max-tool-calls`; see [execution limits](EXECUTION_LIMITS.md). The factory must provide `kind: custom`, a nonempty `version`, and
 `conversation_assessment` (`unassessed` or `deterministic_templates`), with

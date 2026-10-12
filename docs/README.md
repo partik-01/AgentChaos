@@ -11,6 +11,7 @@ scenario, and inspect its evidence. No model API key is needed for that path.
 | Connect an existing Python agent | [Custom agents](CUSTOM_AGENTS.md) |
 | Require tool order, bounded calls or stable retry arguments | [Tool rules](TOOL_RULES.md) |
 | Stop hung targets or endless tool loops | [Execution limits](EXECUTION_LIMITS.md) |
+| Read saved trials before a suite finishes or after interruption | [Partial suite results](PARTIAL_SUITES.md) |
 | Understand payment/idempotency/fault semantics | [API contract](API.md) |
 | Understand offline evidence validation | [Trace validation](TRACE_VALIDATION.md) |
 | Fix a setup, integration or result problem | [Troubleshooting](TROUBLESHOOTING.md) |
